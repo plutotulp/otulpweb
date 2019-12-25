@@ -105,14 +105,18 @@ mkRotMap :: Int -> Map Char Char
 mkRotMap n =
   Map.fromList (lcase ++ ucase)
   where
+    n' =
+      -- handles negative n well
+      n `mod` List.length lowerCaseAlpha
+
     lcase =
       List.zip
       lowerCaseAlpha
-      (List.drop n (cycle lowerCaseAlpha))
+      (List.drop n' (cycle lowerCaseAlpha))
     ucase =
       List.zip
       upperCaseAlpha
-      (List.drop n (cycle upperCaseAlpha))
+      (List.drop n' (cycle upperCaseAlpha))
 
 updateModel :: Action -> Model -> Effect Action Model
 updateModel action model' =
