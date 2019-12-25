@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Compiles webclient to Javascript, then serves it at
+# localhost:$PORT. Does not watch for changes, do you must re-run if
+# the code changes.
+
+export PORT=8080
+export BUILDDIR=build/webclient/bin/webclient.jsexe
+
+make webclient && bash -c "cd $BUILDDIR && python2 -m SimpleHTTPServer $PORT"
