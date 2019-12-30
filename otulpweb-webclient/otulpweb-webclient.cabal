@@ -1,4 +1,4 @@
-name: otulpweb
+name: otulpweb-webclient
 version: 0.1.0.0
 synopsis: www.otulp.net website
 category: Web
@@ -14,9 +14,6 @@ executable webclient
                , Model
                , View
 
-  ghc-options: -Wall
-  ghcjs-options: -dedupe -Wall
-  default-language: Haskell2010
   build-depends: base
                , miso
                , containers
@@ -28,3 +25,7 @@ executable webclient
                  , jsaddle-warp
                  , warp
                  , websockets
+
+  ghc-options: -Wall
+  ghcjs-options: -dedupe -Wall
+  default-language: Haskell2010
