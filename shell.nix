@@ -1,15 +1,26 @@
-with (import ./default.nix);
+# Sets up development environment, currently only for the webclient
+# package. Run the 'run-webclient-ghcid' command to start a ghcid
+# loop.
+
 let
-  ghcid =
-    "${misopkgs.pkgs.haskell.packages.ghc865.ghcid}/bin/ghcid";
-  cabal =
-    "${misopkgs.pkgs.haskell.packages.ghc865.cabal-install}/bin/cabal";
+  def =
+    import ./default.nix {};
+  misoGhcid =
+    "${def.misopkgs.pkgs.haskell.packages.ghc865.ghcid}/bin/ghcid";
+  misoCabal =
+    "${def.misopkgs.pkgs.haskell.packages.ghc865.cabal-install}/bin/cabal";
 in
-webclient-dev.env.overrideAttrs (old: {
+def.webclient-dev.env.overrideAttrs (old: {
   shellHook = ''
-    function gcid_webclient_jsaddle () {
-      pushd otulpweb-webclient 2>/dev/null
-      ${ghcid} -r --poll=1 -c '${cabal} new-repl --write-ghc-environment-files=never'
+    function run-webclient-ghcid () {
+      pushd otulpweb-webclient >/dev/null
+      ${misoGhcid} --poll=1 -c '${misoCabal} new-repl --write-ghc-environment-files=never'
     }
   '';
+  # shellHook = ''
+  #   function run-webclient-ghcid () {
+  #     pushd otulpweb-webclient >/dev/null
+  #     ${misoGhcid} -r --poll=1 -c '${misoCabal} new-repl --write-ghc-environment-files=never'
+  #   }
+  # '';
 })
