@@ -1,0 +1,72 @@
+#+TITLE: www.otulp.net
+#+OPTIONS: ^:{} toc:nil
+
+* Overview
+  Server and client code for the www.otulp.net web site.
+
+  Client in this case basically means the web site contents. The idea
+  is that the server supplies the client code at the root path, and
+  otherwise acts as an API server for the client.
+
+  In practice, the client has no need for the server for now; the
+  server basically does nothing. What you get at https://www.otulp.net
+  is just the client served by nginx.
+
+* Prerequisites
+  - Nix :: Get it at https://nixos.org
+  - Cachix :: An binary cache (https://cachix.org) that lets us avoid
+    compiling GHCJS from scratch (or, as is usually the case: try to
+    compile and run out of memory).
+  - GNU make :: The build tool that was too simplistic, twisted into
+    something that still doesn't fit modern demands.
+
+  Well, nix can of course provide the latter two.
+
+* Build
+  Enable =miso= =cachix= cache. May need additional configuration that
+  I don't remember anymore.
+
+  #+begin_src shell
+    cachix use miso
+  #+end_src
+
+  Build both =server= and =client= code in the =build= directory,
+  using =nix=.
+  #+begin_src shell
+    make
+  #+end_src
+
+* Development builds
+  During client development, it is sure nice to be able to iterate a
+  bit faster than GHCJS allows for. The =webclient-dev-ghcid= PHONY
+  Make target compiles the client code with normal GHC and jsaddle.
+
+  #+begin_src shell
+    make webclient-dev-ghcid
+  #+end_src
+
+  This basically changes the application to use server-side rendering,
+  but is not stable. You will run into bugs. When that happens, it is
+  time to build with =webclient-dev-server= instead:
+
+  #+begin_src shell
+    make webclient-dev-server
+  #+end_src
+
+  The dev client server listens at http://localhost:3000.
+
+* Tasks remaining [0/2]
+
+** TODO Integrate deployment into server nix config
+   We do builds with nix, but it sure would be nice to deploy with nix
+   as well. I'm not sure how to solve this, but thinking I could
+   probably make a NixOS module and source it from
+   configuration.nix. It should support fixing at some git tag/ref.
+
+** TODO Make server nix-depend on client
+   Right now, server just serves whatever is in some directory, and
+   seems to be caching aggressively, so just rebuilding the client
+   does not mean the server caught up with the new stuff. This is why
+   the server code just gets ignored at the moment and the
+   =webclient-dev-server= Make target uses the stand-alone
+   =haskellPackages.wai-app-static= server instead.

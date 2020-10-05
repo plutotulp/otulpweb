@@ -1,3 +1,5 @@
+cabal-version: 2.2
+
 name: otulpweb-webclient
 version: 0.1.0.0
 synopsis: www.otulp.net website
@@ -5,19 +7,23 @@ category: Web
 license: ISC
 license-file: LICENSE
 build-type: Simple
-cabal-version: >= 2.0
 
 executable webclient
   hs-source-dirs: src
   main-is: Main.hs
   other-modules: BaseM
                , Model
+               , Obfuscate.Model
+               , Obfuscate.View
+               , Pong.Model
+               , Pong.View
+               , State
                , View
-
   build-depends: base
                , miso
                , containers
                , lens
+               , linear
                , mtl
                , text
   if !impl(ghcjs)

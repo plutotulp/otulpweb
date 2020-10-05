@@ -10,13 +10,18 @@ import Miso
 
 import BaseM (runApp)
 import Model
+  ( Action(ShowApp)
+  , AppName(Top)
+  , initModel
+  , subsRequired
+  , updateModel)
 import View (viewModel)
 
 main :: IO ()
 main =
   runApp $ startApp $ App
   { initialAction =
-      Encrypt ""
+      ShowApp Top
   , Miso.model =
       initModel
   , update =
@@ -26,7 +31,7 @@ main =
   , events =
       defaultEvents
   , subs =
-      []
+      subsRequired
   , mountPoint =
       Nothing -- Nothing => 'body'
   }

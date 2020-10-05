@@ -1,20 +1,6 @@
-{
-  misopkgs ?
-  import (builtins.fetchTarball {
-    # A Miso version of nixpkgs. Use with cachix to avoid waiting
-    # forever for GHCJS to compile (and then running out of memory
-    # before it finishes).
-    url = "https://github.com/dmjio/miso/archive/561ffad.tar.gz";
-    sha256 = "1wwzckz2qxb873wdkwqmx9gmh0wshcdxi7gjwkba0q51jnkfdi41";
-  }) {}
-
-, nixpkgs ?
-  import (builtins.fetchTarball {
-    # Pinned nixpkgs, this one from the haskell-packages branch at
-    # 2019-12-30.
-    url = "https://github.com/NixOS/nixpkgs/archive/07d0412f8de5ea6051ab22a7577a97705699459e.tar.gz";
-    sha256 = "0f2ly7si7cb9g7qg4jzscqip1bzb3zpzvp6rn1sadzc11smrmz6a";
-  }) {}
+{ # Basically GHCJS and some miso-specific stuff.
+  misopkgs ? import ./nix/pinned-misopkgs.nix
+, nixpkgs ? import ./nix/pinned-nixpkgs.nix
 }:
 {
   # Required by shell.nix.

@@ -1,16 +1,18 @@
 .PHONY: all
-all:	webclient server
+all:	build/webclient build/server
 
+# We'll put all builds in here. Or rather, we'll put all build
+# symlinks in here.
 build:
 	mkdir -p build
 
-.PHONY: webclient
-webclient: build
-	nix-build -A webclient -o build/webclient
+# Poor man's PHONY.
+.FORCE:
 
-.PHONY: server
-server: build
-	nix-build -A server -o build/server
+# Build any of the derivations defined in default.nix, like
+# "webclient-dev" or "server".
+build/*: .FORCE build
+	nix-build -A $(notdir $@) -o $@
 
 .PHONY: clean
 clean:
@@ -25,8 +27,13 @@ clean:
 webclient-dev-ghcid: build
 	nix-shell --run run-webclient-ghcid
 
-# Build webclient and serve with a very basic python web server.
+# Build webclient and serve statically. Does not run the
+# otulpweb-server code.
 .PHONY: webclient-dev-server
-webclient-dev-server: webclient
-	cd build/webclient/bin/webclient.jsexe && \
-	python2 -m SimpleHTTPServer 8080
+webclient-dev-server: build/webclient
+	nix-shell -p haskellPackages.wai-app-static --run \
+	'warp -d build/webclient/bin/webclient.jsexe -h localhost -p 3000'
+
+# FIXME: There's no "dev server" target here yet, because the server
+# code is basically unused at the moment; it's all client code served
+# by nginx when deployed.
