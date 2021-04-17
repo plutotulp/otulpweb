@@ -1,19 +1,14 @@
+{-# language DeriveGeneric #-}
 {-# language LambdaCase #-}
+{-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
-{-# language TemplateHaskell #-}
 {-# language RankNTypes #-}
 
 module Model
 
   ( -- * Model and its lenses.
     Model(..)
-  , obfuscate
-  , pong
-  , selected
   , AppName(..)
-  , _Top
-  , _Obfuscate
-  , _Pong
 
   -- * Create and update model.
   , initModel
@@ -21,9 +16,6 @@ module Model
 
   -- * Actions and their prisms.
   , Action(..)
-  , _ShowApp
-  , _PongAction
-  , _ObfuscateAction
 
     -- * Subscriptions
   , subsRequired
@@ -38,6 +30,8 @@ import Control.Lens
 -- import Data.Map.Strict (Map)
 -- import qualified Data.Map.Strict as Map
 -- import Data.Maybe (fromMaybe)
+import Data.Generics.Labels ()
+import GHC.Generics (Generic)
 -- import Miso (Effect, (<#), noEff, KeyCode)
 import Miso (Effect, Sub, mapSub)
 -- import qualified Miso.String
@@ -53,28 +47,24 @@ data AppName
   = Top
   | Obfuscate
   | Pong
-  deriving (Eq, Show)
-
-makePrisms ''AppName
+  deriving (Eq, Generic, Show)
 
 data Model =
   Model
-  { _obfuscate :: Obfuscate.Model.Model
-  , _pong :: Pong.Model.Model
-  , _selected :: AppName
+  { obfuscate :: Obfuscate.Model.Model
+  , pong :: Pong.Model.Model
+  , selected :: AppName
   }
-  deriving (Eq, Show)
-
-makeLenses ''Model
+  deriving (Eq, Generic, Show)
 
 initModel :: Model
 initModel =
   Model
-  { _obfuscate =
+  { obfuscate =
       Obfuscate.Model.initModel
-  , _pong =
+  , pong =
       Pong.Model.initModel
-  , _selected =
+  , selected =
       Top
   }
 
@@ -82,9 +72,7 @@ data Action
   = ShowApp AppName
   | PongAction Pong.Model.Action
   | ObfuscateAction Obfuscate.Model.Action
-  deriving (Show, Eq)
-
-makePrisms ''Action
+  deriving (Show, Generic, Eq)
 
 -- | Pass on @subAction@ and part of @model@ to the update function,
 -- then lift the resulting @Effect subAction subModel@ to an @Effect
@@ -109,15 +97,15 @@ updateModel :: Model -> Action -> Effect Action Model
 updateModel model = \case
 
   ShowApp app ->
-    State.noEff model (selected .= app)
+    State.noEff model (#selected .= app)
 
   ObfuscateAction action ->
     liftApp model action
-    ObfuscateAction obfuscate Obfuscate.Model.updateModel
+    ObfuscateAction #obfuscate Obfuscate.Model.updateModel
 
   PongAction action ->
     liftApp model action
-    PongAction pong Pong.Model.updateModel
+    PongAction #pong Pong.Model.updateModel
 
 subsRequired :: [Sub Action]
 subsRequired =

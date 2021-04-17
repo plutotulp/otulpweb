@@ -1,3 +1,4 @@
+{-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
 
 module View
@@ -26,12 +27,12 @@ viewTop _model =
 
 viewModel :: Model -> View Action
 viewModel model =
-  case model^.selected of
+  case model ^. #selected of
     Top ->
       viewTop model
     Obfuscate ->
       ObfuscateAction
-      <$> Obfuscate.View.viewModel (model^.obfuscate)
+      <$> Obfuscate.View.viewModel (model ^. #obfuscate)
     Pong ->
       PongAction
-      <$> Pong.View.viewModel (model^.pong)
+      <$> Pong.View.viewModel (model ^. #pong)

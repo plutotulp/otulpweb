@@ -1,3 +1,4 @@
+{-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
 
 module Obfuscate.View
@@ -32,8 +33,8 @@ viewModel model =
   [ h1_ [] [text "Tallifisér"]
   , p_ [] [text "Skriv inn teksten din, så koder jeg den om."]
   , textarea_ [onInput Encrypt] []
-  , p_ [] [text ("Tallifisering:" <> (model^.numField))]
+  , p_ [] [text ("Tallifisering:" <> (model ^. #numField))]
 
-  , input_ [onInput SetRotNum, maxlength_ "3", value_ (model^.rotNum.to ms)]
-  , p_ [] [text ("ROT-" <> ms (_rotNum model) <> ": " <> (model^.rotField))]
+  , input_ [onInput SetRotNum, maxlength_ "3", value_ (model ^. #rotNum . to ms)]
+  , p_ [] [text ("ROT-" <> ms (model ^. #rotNum) <> ": " <> (model ^. #rotField))]
   ]

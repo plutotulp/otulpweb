@@ -1,15 +1,12 @@
+{-# language DeriveGeneric #-}
 {-# language LambdaCase #-}
+{-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
-{-# language TemplateHaskell #-}
 
 module Pong.Model
 
   ( -- * Model and its lenses.
     Model(..)
-  , ballPos
-  , ballVel
-  , mouseAt
-  , windowSize
 
   -- * Create and update model.
   , initModel
@@ -17,8 +14,6 @@ module Pong.Model
 
   -- * Actions and their prisms.
   , Action(..)
-  , _WasdArrows
-  , _MousePos
 
   -- * Subscriptions required
   , subsRequired
@@ -36,7 +31,9 @@ import Linear.Metric
 -- import qualified Data.List as List
 -- import Data.Map.Strict (Map)
 -- import qualified Data.Map.Strict as Map
+import Data.Generics.Labels ()
 -- import Data.Maybe (fromMaybe)
+import GHC.Generics (Generic)
 -- import Miso (Effect, (<#), noEff, KeyCode(KeyCode))
 import Miso (Effect, Sub)
 -- import qualified Miso.String
@@ -50,24 +47,22 @@ import qualified State
 
 data Model =
   Model
-  { _ballPos :: V2 Double
-  , _ballVel :: V2 Double
-  , _mouseAt :: V2 Int
-  , _windowSize :: V2 Int
-  , _bodyMargin :: Int
+  { ballPos :: V2 Double
+  , ballVel :: V2 Double
+  , mouseAt :: V2 Int
+  , windowSize :: V2 Int
+  , bodyMargin :: Int
   }
-  deriving (Eq, Show)
-
-makeLenses ''Model
+  deriving (Eq, Generic, Show)
 
 initModel :: Model
 initModel =
   Model
-  { _ballPos = V2 200 200
-  , _ballVel = V2 0 0
-  , _mouseAt = V2 0 0
-  , _windowSize = V2 800 600
-  , _bodyMargin = 8
+  { ballPos = V2 200 200
+  , ballVel = V2 0 0
+  , mouseAt = V2 0 0
+  , windowSize = V2 800 600
+  , bodyMargin = 8
   }
 
 data Action
@@ -76,9 +71,7 @@ data Action
   | MousePos (Int, Int)
   | WindowSize (Int, Int)
   | ChaseMouse
-  deriving (Show, Eq)
-
-makePrisms ''Action
+  deriving (Show, Generic, Eq)
 
 updateModel :: Model -> Action -> Effect Action Model
 updateModel model = \case
@@ -94,26 +87,26 @@ updateModel model = \case
           V2
           (fromIntegral (arrowX arrows) * 10)
           (fromIntegral (negate (arrowY arrows)) * 10)
-      ballPos %= (+ delta)
+      #ballPos %= (+ delta)
 
   MousePos (x, y) -> do
     State.singleEff model $ do
       let
         mrg =
-          model^.bodyMargin
-      mouseAt .= V2 (x-mrg) (y-mrg)
+          model ^. #bodyMargin
+      #mouseAt .= V2 (x-mrg) (y-mrg)
       pure (pure ChaseMouse)
 
   WindowSize (h, w) -> do
     State.noEff model $ do
-      windowSize .= V2 w h
+      #windowSize .= V2 w h
 
   ChaseMouse -> do
     let
       mp =
-        fromIntegral <$> model^.mouseAt
+        fromIntegral <$> model ^. #mouseAt
       bp =
-        model^.ballPos
+        model ^. #ballPos
     case distanceA mp bp < 0.5 of
       False -> do
         let
@@ -122,7 +115,7 @@ updateModel model = \case
           diff =
             (* (min dist 5)) <$> normalize (mp .-. bp)
         State.singleEff model $ do
-          ballPos %= (+diff)
+          #ballPos %= (+diff)
           pure (pure ChaseMouse)
       True ->
         pure model

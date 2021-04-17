@@ -1,7 +1,7 @@
 cabal-version: 2.2
 
 name: otulpweb-webclient
-version: 0.1.0.0
+version: 0.1.0.1
 synopsis: www.otulp.net website
 category: Web
 license: ISC
@@ -22,6 +22,7 @@ executable webclient
   build-depends: base
                , miso
                , containers
+               , generic-lens
                , lens
                , linear
                , mtl
@@ -31,7 +32,6 @@ executable webclient
                  , jsaddle-warp
                  , warp
                  , websockets
-
   ghc-options: -Wall
   ghcjs-options: -dedupe -Wall
   default-language: Haskell2010

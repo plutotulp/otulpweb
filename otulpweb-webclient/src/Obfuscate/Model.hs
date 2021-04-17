@@ -1,16 +1,12 @@
+{-# language DeriveGeneric #-}
 {-# language LambdaCase #-}
+{-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
-{-# language TemplateHaskell #-}
 
 module Obfuscate.Model
 
   ( -- * Model and its lenses.
     Model(..)
-  , inputField
-  , numField
-  , rotNum
-  , rotMap
-  , rotField
 
   -- * Create and update model.
   , initModel
@@ -18,18 +14,18 @@ module Obfuscate.Model
 
   -- * Actions and their prisms.
   , Action(..)
-  , _Encrypt
-  , _SetRotNum
 
   ) where
 
 import Control.Lens
 
 import qualified Data.Char as Char
+import Data.Generics.Labels ()
 import qualified Data.List as List
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Maybe (fromMaybe)
+import GHC.Generics (Generic)
 import Miso (Effect)
 import qualified Miso.String
 import Miso.String (MisoString)
@@ -64,24 +60,22 @@ upperCaseAlpha =
 
 data Model =
   Model
-  { _inputField :: MisoString
-  , _numField :: MisoString
-  , _rotNum :: Int
-  , _rotMap :: Map Char Char
-  , _rotField :: MisoString
+  { inputField :: MisoString
+  , numField :: MisoString
+  , rotNum :: Int
+  , rotMap :: Map Char Char
+  , rotField :: MisoString
   }
-  deriving (Eq, Show)
-
-makeLenses ''Model
+  deriving (Eq, Generic, Show)
 
 initModel :: Model
 initModel =
   Model
-  { _inputField = ""
-  , _numField = ""
-  , _rotNum = rn
-  , _rotMap = mkRotMap rn
-  , _rotField = ""
+  { inputField = ""
+  , numField = ""
+  , rotNum = rn
+  , rotMap = mkRotMap rn
+  , rotField = ""
   }
   where
     rn = 13
@@ -90,8 +84,6 @@ data Action
   = Encrypt MisoString
   | SetRotNum MisoString
   deriving (Show, Eq)
-
-makePrisms ''Action
 
 toNum :: Char -> MisoString
 toNum c =
@@ -112,12 +104,12 @@ updateModel model = \case
       State.noEff model $ do
         let
           rm =
-            model^.rotMap
-        inputField .=
+            model ^. #rotMap
+        #inputField .=
           str
-        numField .=
+        #numField .=
           Miso.String.concatMap toNum (Miso.String.toLower str)
-        rotField .=
+        #rotField .=
           Miso.String.map (substCipher rm) str
 
     SetRotNum numStr -> do
@@ -125,8 +117,8 @@ updateModel model = \case
         let
           rn =
             fromMaybe 0 (readMaybe (Miso.String.unpack numStr))
-        rotNum .=
+        #rotNum .=
           rn
-        rotMap .=
+        #rotMap .=
           mkRotMap rn
-        pure (pure (Encrypt (model^.inputField)))
+        pure (pure (Encrypt (model ^. #inputField)))
