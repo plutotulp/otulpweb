@@ -11,6 +11,9 @@ build:
 
 # Build any of the derivations defined in default.nix, like
 # "webclient-dev" or "server".
+#
+# FIXME: Only really works if the directory already exists, så the
+# rule has something to match against on the file system.
 build/*: .FORCE build
 	nix-build -A $(notdir $@) -o $@
 
