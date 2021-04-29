@@ -13,7 +13,7 @@ import Miso (Effect, (<#))
 import BaseM (BaseM)
 
 -- | Update model without firing any actions.
-noEff :: model -> State model ignored -> Effect action model
+noEff :: model -> State model () -> Effect action model
 noEff model act =
   Miso.noEff (execState act model)
 
