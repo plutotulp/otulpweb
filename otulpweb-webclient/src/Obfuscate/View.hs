@@ -32,9 +32,10 @@ viewModel model =
   [ ]
   [ h1_ [] [text "Tallifisér"]
   , p_ [] [text "Skriv inn teksten din, så koder jeg den om."]
-  , textarea_ [onInput Encrypt] []
+  , textarea_ [onInput SetInput] []
   , p_ [] [text ("Tallifisering:" <> (model ^. #numField))]
 
+  , input_ [onInput SetPassword, maxlength_ "1000", value_ (model ^. #pwdField . to ms)]
   , input_ [onInput SetRotNum, maxlength_ "3", value_ (model ^. #rotNum . to ms)]
   , p_ [] [text ("ROT-" <> ms (model ^. #rotNum) <> ": " <> (model ^. #rotField))]
   ]

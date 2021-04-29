@@ -61,6 +61,7 @@ upperCaseAlpha =
 data Model =
   Model
   { inputField :: MisoString
+  , pwdField :: MisoString
   , numField :: MisoString
   , rotNum :: Int
   , rotMap :: Map Char Char
@@ -72,6 +73,7 @@ initModel :: Model
 initModel =
   Model
   { inputField = ""
+  , pwdField = "SUPERSECRET"
   , numField = ""
   , rotNum = rn
   , rotMap = mkRotMap rn
@@ -81,7 +83,9 @@ initModel =
     rn = 13
 
 data Action
-  = Encrypt MisoString
+  = Encrypt
+  | SetInput MisoString
+  | SetPassword MisoString
   | SetRotNum MisoString
   deriving (Show, Eq)
 
@@ -100,13 +104,13 @@ substCipher mp c =
 updateModel :: Model -> Action -> Effect Action Model
 updateModel model = \case
 
-    Encrypt str -> do
+    Encrypt -> do
       State.noEff model $ do
         let
           rm =
             model ^. #rotMap
-        #inputField .=
-          str
+          str =
+            model ^. #inputField
         #numField .=
           Miso.String.concatMap toNum (Miso.String.toLower str)
         #rotField .=
@@ -121,4 +125,15 @@ updateModel model = \case
           rn
         #rotMap .=
           mkRotMap rn
-        pure (pure (Encrypt (model ^. #inputField)))
+        pure (pure Encrypt)
+
+    SetPassword pwdStr -> do
+      State.singleEff model $ do
+        #pwdField .= pwdStr
+        (pure . pure) Encrypt
+
+
+    SetInput inStr -> do
+      State.singleEff model $ do
+        #inputField .= inStr
+        pure (pure Encrypt)
