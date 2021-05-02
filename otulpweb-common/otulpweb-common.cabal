@@ -1,7 +1,7 @@
 cabal-version: 2.4
 
 name:     otulpweb-common
-version:  0.1.0.1
+version:  0.1.0.2
 synopsis: www.otulp.net shared code
 
 license:      ISC
