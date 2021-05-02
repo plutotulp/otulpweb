@@ -1,29 +1,37 @@
 { # Basically GHCJS and some miso-specific stuff.
-  misopkgs ? import ./nix/pinned-misopkgs.nix
-, nixpkgs ? import ./nix/pinned-nixpkgs.nix
+  nixpkgs  ? import ./nix/pinned-nixpkgs.nix
+, misopkgs ? import ./nix/pinned-misopkgs.nix
 }:
+let
+  cfg = {
+    webclient = {
+      ghc = {
+        # compiler = misopkgs.pkgs.haskell.compiler.ghc865;
+        haskellPackages = misopkgs.pkgs.haskell.packages.ghc865;
+      };
+      ghcjs = {
+        # compiler = misopkgs.pkgs.haskell.compiler.ghcjs;
+        haskellPackages = misopkgs.pkgs.haskell.packages.ghcjs;
+      };
+    };
+    server = {
+      ghc = {
+        # compiler = nixpkgs.haskell.compiler.ghc8104;
+        haskellPackages = nixpkgs.haskell.packages.ghc8104;
+      };
+    };
+  };
+in
 {
-  # Required by shell.nix.
-  misopkgs =
-    misopkgs;
+  inherit misopkgs nixpkgs cfg;
 
-  # Run tight interpreter loop with ghcid, using ghc and jsaddle
-  # instead of ghcjs. This is good for catching type errors, but less
-  # so for actually running the code.
-  webclient-dev =
-    with misopkgs;
-    pkgs.haskell.packages.ghc865.callCabal2nix
-      "otulpweb-webclient" ./otulpweb-webclient { miso = miso-jsaddle; };
-
-  # Build webclient for release, using ghcjs.
   webclient =
-    with misopkgs;
-    pkgs.haskell.packages.ghcjs.callCabal2nix
-      "otulpweb-webclient" ./otulpweb-webclient {};
+    import ./otulpweb-webclient { inherit nixpkgs misopkgs; };
 
-  # Build server for release.
+  common =
+    import ./otulpweb-common {inherit nixpkgs misopkgs; };
+
   server =
-    with nixpkgs;
-    haskellPackages.callCabal2nix "otulpweb-server" ./otulpweb-server {};
+    import ./otulpweb-server {inherit nixpkgs misopkgs; };
 
 }

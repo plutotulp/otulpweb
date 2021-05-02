@@ -1,37 +1,41 @@
-cabal-version: 2.2
+cabal-version: 2.4
 
-name: otulpweb-webclient
-version: 0.1.0.1
-synopsis: www.otulp.net website
-category: Web
-license: ISC
+name:         otulpweb-webclient
+version:      0.1.0.1
+synopsis:     www.otulp.net website
+
+license:      ISC
 license-file: LICENSE
-build-type: Simple
+author:       Erlend Pedersen
+maintainer:   erlendpe@online.no
+copyright:    Erlend Pedersen 2021
+category:     Web
 
 executable webclient
-  hs-source-dirs: src
-  main-is: Main.hs
-  other-modules: BaseM
-               , Model
-               , Obfuscate.Model
-               , Obfuscate.View
-               , Pong.Model
-               , Pong.View
-               , State
-               , View
-  build-depends: base
-               , miso
-               , containers
-               , generic-lens
-               , lens
-               , linear
-               , mtl
-               , text
-  if !impl(ghcjs)
-    build-depends: jsaddle
-                 , jsaddle-warp
-                 , warp
-                 , websockets
-  ghc-options: -Wall
-  ghcjs-options: -dedupe -Wall
   default-language: Haskell2010
+  hs-source-dirs:   src
+  ghc-options:      -Wall
+  ghcjs-options:    -dedupe -Wall
+  main-is:          Main.hs
+  other-modules:    BaseM
+                  , Model
+                  , Obfuscate.Model
+                  , Obfuscate.View
+                  , Pong.Model
+                  , Pong.View
+                  , State
+                  , View
+  build-depends:    base
+                  , otulpweb-common
+                  , miso
+                  , containers
+                  , generic-lens
+                  , lens
+                  , linear
+                  , mtl
+                  , text
+  if !impl(ghcjs)
+    build-depends:  jsaddle
+                  , jsaddle-warp
+                  , warp
+                  , websockets

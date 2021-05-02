@@ -30,32 +30,51 @@
     cachix use miso
   #+end_src
 
-  Build both =server= and =client= code in the =build= directory,
+  Build both =server= and =webclient= code in the =build= directory,
   using =nix=.
+
   #+begin_src shell
     make
   #+end_src
 
 * Development builds
   During client development, it is sure nice to be able to iterate a
-  bit faster than GHCJS allows for. The =webclient-dev-ghcid= PHONY
-  Make target compiles the client code with normal GHC and jsaddle.
+  bit faster than GHCJS allows for. The =SOMETHING-dev-ghcid= PHONY
+  targes run a ghcid session with the normal GHC compiler and
+  hlint. This makes it possible to verify that code compiles, quickly
+  recompiling when code changes.
 
   #+begin_src shell
-    make webclient-dev-ghcid
+    # work on client code
+    make webclient-ghcid
+
+    # work on common code
+    make common-ghcid
+
+    # work on common code tests
+    make common-ghcid-tasty
   #+end_src
 
-  This basically changes the application to use server-side rendering,
-  but is not stable. You will run into bugs. When that happens, it is
-  time to build with =webclient-dev-server= instead:
+  All the above will tell you if code compiles, and provide linting,
+  but will not *run* the code. To build a release version of the
+  webclient and serve it locally, use a special PHONY target:
 
   #+begin_src shell
+    # ad-hoc server listens at http://localhost:3000.
     make webclient-dev-server
   #+end_src
 
-  The dev client server listens at http://localhost:3000.
+  Note that this does *not* use otulpweb-server, but rather just
+  builds otulpweb-webclient and serves the static js and html files
+  with wai-app-static. This is because otulpweb-server is not ready
+  for use yet.
 
 * Tasks remaining [0/2]
+
+** TODO Build server
+   Currently, =make all= just builds the webclient. The server has not
+   seen much love yet, because it isn't really needed. The webclient
+   is currently a static app.
 
 ** TODO Integrate deployment into server nix config
    We do builds with nix, but it sure would be nice to deploy with nix
@@ -70,3 +89,7 @@
    the server code just gets ignored at the moment and the
    =webclient-dev-server= Make target uses the stand-alone
    =haskellPackages.wai-app-static= server instead.
+
+   Update: Long time since I looked at the server code. Could perhaps
+   have a look at how otulpweb-common gets built by otulpweb-webclient
+   and re-use that?

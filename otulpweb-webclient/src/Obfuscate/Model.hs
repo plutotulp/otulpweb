@@ -1,4 +1,5 @@
 {-# language DeriveGeneric #-}
+{-# language ViewPatterns #-}
 {-# language LambdaCase #-}
 {-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
@@ -8,6 +9,9 @@ module Obfuscate.Model
   ( -- * Model and its lenses.
     Model(..)
 
+    -- * Re-exports
+  , RotKey(..)
+
   -- * Create and update model.
   , initModel
   , updateModel
@@ -15,125 +19,123 @@ module Obfuscate.Model
   -- * Actions and their prisms.
   , Action(..)
 
+  -- * Utilities
+  , msVigKey
+
   ) where
 
 import Control.Lens
 
-import qualified Data.Char as Char
+-- import qualified Data.Char as Char
 import Data.Generics.Labels ()
-import qualified Data.List as List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Maybe (fromMaybe)
+-- import qualified Data.List as List
+-- import Data.Map.Strict (Map)
+-- import qualified Data.Map.Strict as Map
+import Data.Maybe (mapMaybe, fromMaybe)
 import GHC.Generics (Generic)
 import Miso (Effect)
 import qualified Miso.String
-import Miso.String (MisoString)
+import Miso.String (MisoString, fromMisoString, ms)
 import Text.Read (readMaybe)
+
+import OtulpWeb.Common.Rot (RotKey(..))
+import qualified OtulpWeb.Common.Rot as Rot
+import OtulpWeb.Common.Vigenere (VigKey(..))
+import qualified OtulpWeb.Common.Vigenere as Vig
 
 import qualified State
 
-mkRotMap :: Int -> Map Char Char
-mkRotMap n =
-  Map.fromList (lcase ++ ucase)
-  where
-    n' =
-      -- handles negative n well
-      n `mod` List.length lowerCaseAlpha
-
-    lcase =
-      List.zip
-      lowerCaseAlpha
-      (List.drop n' (cycle lowerCaseAlpha))
-    ucase =
-      List.zip
-      upperCaseAlpha
-      (List.drop n' (cycle upperCaseAlpha))
-
-lowerCaseAlpha :: [Char]
-lowerCaseAlpha =
-  ['a'..'z'] ++ ['æ','ø','å']
-
-upperCaseAlpha :: [Char]
-upperCaseAlpha =
-  List.map Char.toUpper lowerCaseAlpha
-
 data Model =
   Model
-  { inputField :: MisoString
-  , pwdField :: MisoString
-  , numField :: MisoString
-  , rotNum :: Int
-  , rotMap :: Map Char Char
-  , rotField :: MisoString
+  { inputText :: MisoString
+  , plainText :: MisoString
+
+  , numCt :: MisoString
+  , numPt :: MisoString
+
+  , rotKey :: RotKey
+  , rotCt :: MisoString
+  , rotPt :: MisoString
+
+  , vigKey :: VigKey
+  , vigCt :: MisoString
+  , vigPt :: MisoString
   }
   deriving (Eq, Generic, Show)
 
 initModel :: Model
 initModel =
   Model
-  { inputField = ""
-  , pwdField = "SUPERSECRET"
-  , numField = ""
-  , rotNum = rn
-  , rotMap = mkRotMap rn
-  , rotField = ""
+  { inputText = ""
+  , plainText = ""
+
+  , numCt = ""
+  , numPt = ""
+
+  , rotKey = rk
+  , rotCt = ""
+  , rotPt = ""
+
+  , vigKey = vk
+  , vigCt = ""
+  , vigPt = ""
   }
   where
-    rn = 13
+    rk = 13
+    vk = Vig.mkVigKey "passord"
 
 data Action
   = Encrypt
   | SetInput MisoString
-  | SetPassword MisoString
-  | SetRotNum MisoString
+  | SetVigenerePassword MisoString
+  | SetRotKey MisoString
   deriving (Show, Eq)
-
-toNum :: Char -> MisoString
-toNum c =
-  maybe "__" (toStr . succ) (List.findIndex (== c) lowerCaseAlpha)
-
-toStr :: Int -> MisoString
-toStr =
-  Miso.String.pack . (' ':) . show
-
-substCipher :: Map Char Char -> Char -> Char
-substCipher mp c =
-  maybe c id (Map.lookup c mp)
 
 updateModel :: Model -> Action -> Effect Action Model
 updateModel model = \case
 
     Encrypt -> do
       State.noEff model $ do
-        let
-          rm =
-            model ^. #rotMap
-          str =
-            model ^. #inputField
-        #numField .=
-          Miso.String.concatMap toNum (Miso.String.toLower str)
-        #rotField .=
-          Miso.String.map (substCipher rm) str
 
-    SetRotNum numStr -> do
+        let pt = Rot.validText $ model ^. #inputText . to fromMisoString
+
+        #plainText .= ms pt
+
+        let nums = mapMaybe Rot.charToInt pt
+        #numCt .= ms (concatMap show nums)
+        #numPt .= ms (mapMaybe Rot.intToChar nums)
+
+        let rk     = model ^. #rotKey
+            rotCt' = Rot.rotEncString rk pt
+            rotPt' = Rot.rotDecString rk rotCt'
+        #rotCt .= ms rotCt'
+        #rotPt .= ms rotPt'
+
+        let vk = model ^. #vigKey
+            vigCt' = Vig.vigEncString vk pt
+            vigPt' = Vig.vigDecString vk vigCt'
+        #vigCt .= ms vigCt'
+        #vigPt .= ms vigPt'
+
+    SetRotKey str -> do
       State.singleEff model $ do
         let
-          rn =
-            fromMaybe 0 (readMaybe (Miso.String.unpack numStr))
-        #rotNum .=
-          rn
-        #rotMap .=
-          mkRotMap rn
+          rk =
+            RotKey (fromMaybe 0 (readMaybe (Miso.String.unpack str)))
+        #rotKey .=
+          rk
         pure (pure Encrypt)
 
-    SetPassword pwdStr -> do
+    SetVigenerePassword (fromMisoString -> str) -> do
       State.singleEff model $ do
-        #pwdField .= pwdStr
-        (pure . pure) Encrypt
-
+        #vigKey .= Vig.mkVigKey str
+        pure (pure Encrypt)
 
     SetInput inStr -> do
       State.singleEff model $ do
-        #inputField .= inStr
+        #inputText .= inStr
         pure (pure Encrypt)
+
+msVigKey :: VigKey -> MisoString
+msVigKey =
+  ms . Vig.ppVigKey

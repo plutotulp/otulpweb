@@ -11,7 +11,7 @@ import Miso
 import BaseM (runApp)
 import Model
   ( Action(ShowApp)
-  , AppName(Top)
+  , AppName(Obfuscate)
   , initModel
   , subsRequired
   , updateModel)
@@ -21,7 +21,7 @@ main :: IO ()
 main =
   runApp $ startApp $ App
   { initialAction =
-      ShowApp Top
+      ShowApp Obfuscate
   , Miso.model =
       initModel
   , update =
