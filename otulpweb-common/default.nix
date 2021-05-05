@@ -1,5 +1,6 @@
-{ nixpkgs  ? import ../nix/pinned-nixpkgs.nix
-, misopkgs ? import ../nix/pinned-misopkgs.nix
+{ sources  ? import ../nix/sources.nix
+, nixpkgs  ? import sources.nixpkgs {}
+, misopkgs ? import sources.miso {}
 }:
 let
   cfg =
