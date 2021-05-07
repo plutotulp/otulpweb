@@ -81,11 +81,11 @@ validText = filter isValidChar
 
 -- ROT-encrypt lowercase Char into uppercase Char.
 rotEnc :: RotKey -> Char -> Maybe Char
-rotEnc k c = toUpper <$> ((rot k <$> charToInt c) >>= intToChar)
+rotEnc k c = toUpper <$> (charToInt c >>= intToChar . rot k)
 
 -- ROT-decrypt uppercase Char into lowercase Char.
 rotDec :: RotKey -> Char -> Maybe Char
-rotDec k (toLower -> c) = (rot (negate k) <$> charToInt c) >>= intToChar
+rotDec k (toLower -> c) = charToInt c >>= intToChar . rot (negate k)
 
 rotEncString :: RotKey -> String -> String
 rotEncString k str = catMaybes (rotEnc k <$> str)

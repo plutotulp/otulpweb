@@ -1,7 +1,5 @@
 {-# language CPP #-}
-{-# language LambdaCase #-}
 {-# language OverloadedStrings #-}
-{-# language TypeApplications #-}
 
 module BaseM
   ( BaseM

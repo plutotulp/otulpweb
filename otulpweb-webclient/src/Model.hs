@@ -1,7 +1,6 @@
 {-# language DeriveGeneric #-}
 {-# language LambdaCase #-}
 {-# language OverloadedLabels #-}
-{-# language OverloadedStrings #-}
 {-# language RankNTypes #-}
 
 module Model

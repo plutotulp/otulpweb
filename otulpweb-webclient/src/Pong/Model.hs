@@ -1,7 +1,6 @@
 {-# language DeriveGeneric #-}
 {-# language LambdaCase #-}
 {-# language OverloadedLabels #-}
-{-# language OverloadedStrings #-}
 
 module Pong.Model
 
@@ -107,18 +106,19 @@ updateModel model = \case
         fromIntegral <$> model ^. #mouseAt
       bp =
         model ^. #ballPos
-    case distanceA mp bp < 0.5 of
-      False -> do
+      doNothing =
+        pure model
+      moveCloser = do
         let
           dist =
             distanceA mp bp
           diff =
-            (* (min dist 5)) <$> normalize (mp .-. bp)
+            (* min dist 5) <$> normalize (mp .-. bp)
         State.singleEff model $ do
           #ballPos %= (+diff)
           pure (pure ChaseMouse)
-      True ->
-        pure model
+
+    if distanceA mp bp < 0.5 then doNothing else moveCloser
 
 subsRequired :: [Sub Action]
 subsRequired =
