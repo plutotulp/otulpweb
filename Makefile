@@ -1,5 +1,5 @@
 .PHONY: all
-all:	build/webclient.ghcjs.nix-result
+all:	build/otulpweb-webclient.ghcjs.nix-result build/otulpweb-server.nix-result
 
 # We'll put all build symlinks in here.
 build:
@@ -36,9 +36,9 @@ webclient-dev-ghcid:
 # uses an ad-hoc web server instead. Hence, only useful for testing a
 # static client that does not need server-side functionality.
 .PHONY: webclient-dev-server
-webclient-dev-server: build/webclient.ghcjs.nix-result
+webclient-dev-server: build/otulpweb-webclient.ghcjs.nix-result
 	nix-shell -p haskellPackages.wai-app-static --run \
-	'warp -d build/webclient.ghcjs.nix-result/bin/webclient.jsexe -h localhost -p 3000'
+	'warp -d build/otulpweb-webclient.ghcjs.nix-result/bin/webclient.jsexe -h localhost -p 3000'
 
 # Run ghcid session for otulpweb-common.
 .PHONY: common-dev-ghcid
@@ -48,7 +48,7 @@ common-dev-ghcid:
 # Run ghcid session for otulpweb-common's test suite.
 .PHONY: common-dev-ghcid-tasty
 common-dev-ghcid-tasty:
-	cd otulpweb-common && nix-shell --run run-ghcid-tasty
+	cd otulpweb-common && nix-shell --run 'run-ghcid test:tasty'
 
 # Run ghcid session for otulpweb-server.
 .PHONY: server-dev-ghcid

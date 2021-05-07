@@ -1,4 +1,16 @@
 {
+    "gitignore.nix": {
+        "branch": "master",
+        "description": "Nix function for filtering local git sources",
+        "homepage": "",
+        "owner": "hercules-ci",
+        "repo": "gitignore.nix",
+        "rev": "211907489e9f198594c0eb0ca9256a1949c9d412",
+        "sha256": "06j7wpvj54khw0z10fjyi31kpafkr6hi1k0di13k1xp8kywvfyx8",
+        "type": "tarball",
+        "url": "https://github.com/hercules-ci/gitignore.nix/archive/211907489e9f198594c0eb0ca9256a1949c9d412.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "miso": {
         "branch": "master",
         "description": ":ramen: A tasty Haskell front-end framework",
@@ -24,15 +36,15 @@
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "release-20.03",
+        "branch": "haskell-updates",
         "description": "Nix Packages collection",
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "1db42b7fe3878f3f5f7a4f2dc210772fd080e205",
-        "sha256": "05k9y9ki6jhaqdhycnidnk5zrdzsdammbk5lsmsbz249hjhhgcgh",
+        "rev": "b858ba8a7c9f6188f15a2cedee1b7e7a5fe8bbb7",
+        "sha256": "18hcznpfsnc975zz1yi3pwwrgzm2ckxxwl4c4fz3nq9i3jnacfij",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/1db42b7fe3878f3f5f7a4f2dc210772fd080e205.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/b858ba8a7c9f6188f15a2cedee1b7e7a5fe8bbb7.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

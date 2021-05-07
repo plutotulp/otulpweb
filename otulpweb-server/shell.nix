@@ -1,24 +1,8 @@
-# How to start a ghcid dev session for otulpweb-common:
+#  # ghcid session
+#  nix-shell --run run-ghcid
 #
-#   nix-shell --run run-ghcid
-#
+#  # ghcid session for test suite
+#  nix-shell --run run-ghcid test
 
-let
-  def =
-    import ./default.nix {};
-  ghcid =
-    "${def.shell.ghcid.bin}/bin/ghcid";
-  cabal =
-    "${def.shell.cabal-install}/bin/cabal";
-  hlint =
-    "${def.shell.hlint}/bin/hlint";
-
-in
-def.ghc.env.overrideAttrs (old: {
-  shellHook = ''
-      function run-ghcid () {
-          ${ghcid} --lint='${hlint}' --poll=1 -c \
-          '${cabal} new-repl --write-ghc-environment-files=never'
-      }
-  '';
-})
+let proj = import ../. {};
+in (import ../nix/mkShell.nix) proj.devTools proj.otulpweb-server

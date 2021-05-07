@@ -1,20 +1,8 @@
-# How to start a ghcid dev session for webclient:
+#  # ghcid session for library code
+#  nix-shell --run run-ghcid
 #
-#   nix-shell --run run-ghcid
-#
+#  # ghcid session for test suite
+#  nix-shell --run run-ghcid test
 
-let
-  def =
-    import ./default.nix {};
-  ghcid =
-    "${def.shell.ghcid}/bin/ghcid";
-  cabal =
-    "${def.shell.cabal-install}/bin/cabal";
-in
-def.ghc.env.overrideAttrs (old: {
-  shellHook = ''
-    function run-ghcid () {
-      ${ghcid} --poll=1 -c '${cabal} new-repl --write-ghc-environment-files=never'
-    }
-  '';
-})
+let proj = import ../. {};
+in (import ../nix/mkShell.nix) proj.devTools proj.otulpweb-webclient.ghc
