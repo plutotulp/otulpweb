@@ -1,9 +1,8 @@
-{-# language OverloadedStrings #-}
-
 module Main (main) where
 
 import Miso
   ( App(..)
+  , LogLevel(..)
   , defaultEvents
   , startApp
   )
@@ -34,4 +33,5 @@ main =
       subsRequired
   , mountPoint =
       Nothing -- Nothing => 'body'
+  , logLevel = DebugPrerender
   }
