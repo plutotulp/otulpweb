@@ -3,6 +3,7 @@
 {-# language LambdaCase #-}
 {-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
+{-# language TypeApplications #-}
 
 module Obfuscate.Model
 
@@ -24,9 +25,9 @@ module Obfuscate.Model
 
   ) where
 
+import Data.Char
 import Control.Lens
 
--- import qualified Data.Char as Char
 import Data.Generics.Labels ()
 -- import qualified Data.List as List
 -- import Data.Map.Strict (Map)
@@ -97,7 +98,7 @@ updateModel model = \case
     Encrypt -> do
       State.noEff model $ do
 
-        let pt = Rot.validText $ model ^. #inputText . to fromMisoString
+        let pt = Rot.validText (model ^. #inputText . to fromMisoString)
 
         #plainText .= ms pt
 
@@ -128,12 +129,12 @@ updateModel model = \case
 
     SetVigenerePassword (fromMisoString -> str) -> do
       State.singleEff model $ do
-        #vigKey .= Vig.mkVigKey str
+        #vigKey .= Vig.mkVigKey (toLower <$> str)
         pure (pure Encrypt)
 
-    SetInput inStr -> do
+    SetInput (fromMisoString -> inStr) -> do
       State.singleEff model $ do
-        #inputText .= inStr
+        #inputText .= ms @String (toLower <$> inStr)
         pure (pure Encrypt)
 
 msVigKey :: VigKey -> MisoString
