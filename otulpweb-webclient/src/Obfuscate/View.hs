@@ -16,43 +16,50 @@ import Miso.String
 
 import Obfuscate.Model (Model(..), Action(..), RotKey(..), msVigKey)
 
+ct_ :: MisoString -> [View Action]
+ct_ str =
+  [ text "CT: ", span_ [ class_ "text-danger" ] [ text str ] ]
+
+pt_ :: MisoString -> [View Action]
+pt_ str =
+  [ text "PT: ", span_ [ class_ "text-muted" ] [ text str ] ]
+
 viewModel :: Model -> View Action
 viewModel model =
-  div_
-  [ ]
-  [ h1_ [] [ text "Obfuskér" ]
+  div_ [ class_ "container" ]
+  [ div_ [ class_ "row" ]
+    [ div_ [ class_ "col" ]
+      [ h1_ [] [ text "Obfuskér" ]
+      , h2_ [] [ text "Hemmelig melding"]
+      , p_  [ class_ "lead" ] [ text "Skriv din hemmelige melding her" ]
+      , textarea_ [ onInput SetInput
+                  , value_ $ model ^. #inputText ] [] ] ]
 
-  , h2_ [] [ text "Hemmelig melding"]
-  , p_  [] [ text "Skriv din hemmelige melding her" ]
-  , textarea_ [ onInput SetInput
-              , value_ $ model ^. #inputText
-              ]
-    []
+  , div_ [ class_ "row" ]
+    [ div_ [ class_ "col" ]
+      [ h2_ [] [ text "Som tall"]
+      , p_ [] (ct_ numCt')
+      , p_ [] (pt_ numPt') ] ]
 
-  , h2_ [] [ text "Som tall"]
-  , p_ [] [ text $ "CT: " <> numCt' ]
-  , p_ [] [ text $ "PT: " <> numPt' ]
+  , div_ [ class_ "row" ]
+    [ div_ [ class_ "col" ]
+      [ h2_ [] [ text "ROT"]
+      , p_ [] [ text "Nøkkel"
+              , input_ [ onInput SetRotKey
+                       , maxlength_ "9" -- Invalid numbers above this length
+                       , value_ (ms rotKey') ] ]
+      , p_ [] (ct_ rotCt')
+      , p_ [] (pt_ rotPt') ] ]
 
-  , h2_ [] [ text "ROT-kodet"]
-  , p_ [] [ text "Nøkkel"
-          , input_ [ onInput SetRotKey
-                   , maxlength_ "9" -- Invalid numbers above this length
-                   , value_ (ms rotKey')
-                   ]
-          ]
-  , p_ [] [ text $ "CT: " <> rotCt' ]
-  , p_ [] [ text $ "PT: " <> rotPt' ]
+  , div_ [ class_ "row" ]
+    [ div_ [ class_ "col" ]
+      [ h2_ [] [ text "Vigenére"]
+      , p_ [] [ text "Nøkkel"
+              , input_ [ onInput SetVigenerePassword
+                       , value_ vigPwd' ] ]
+      , p_ [] (ct_ vigCt')
+      , p_ [] (pt_ vigPt') ] ] ]
 
-  , h2_ [] [ text "Vigenére"]
-  , p_ [] [ text "Nøkkel"
-          , input_ [ onInput SetVigenerePassword
-                   , value_ vigPwd'
-                   ]
-          ]
-  , p_ [] [text $ "CT: " <> vigCt' ]
-  , p_ [] [text $ "PT: " <> vigPt' ]
-
-  ]
   where
     rotKey' = model ^. #rotKey . to unRotKey
     rotCt'  = model ^. #rotCt
