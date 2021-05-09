@@ -29,7 +29,7 @@ viewModel model =
   div_ [ class_ "container" ]
   [ div_ [ class_ "row" ]
     [ div_ [ class_ "col" ]
-      [ h1_ [] [ text "Obfuskér" ]
+      [ h1_ [] [ text "Krypto" ]
       , h2_ [] [ text "Hemmelig melding"]
       , p_  [ class_ "lead" ] [ text "Skriv din hemmelige melding her" ]
       , textarea_ [ onInput SetInput

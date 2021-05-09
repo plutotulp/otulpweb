@@ -18,6 +18,8 @@ executable webclient
   ghcjs-options:    -dedupe -Wall
   main-is:          Main.hs
   other-modules:    BaseM
+                  , Meter.Model
+                  , Meter.View
                   , Model
                   , Obfuscate.Model
                   , Obfuscate.View

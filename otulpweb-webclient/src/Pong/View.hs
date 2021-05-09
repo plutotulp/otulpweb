@@ -8,7 +8,7 @@ module Pong.View
 import Control.Lens
 import Linear.V2
 
-import qualified Data.Map as Map
+-- import qualified Data.Map as Map
 import Miso hiding (model)
 import Miso.String
 import Miso.Svg
@@ -42,11 +42,14 @@ ball r (V2 x y) =
 viewModel :: Model -> View Action
 viewModel model =
   div_
-  [ Miso.style_ (Map.fromList [("margin", "0px"), ("padding", "0px"), ("border", "0px")]) ]
-  [ Svg.svg_
-    [ Svg.height_ (ms (model ^. #windowSize . _y)), Svg.width_ (ms (model ^. #windowSize . _x)) ]
-    [ ball 50 (model ^. #ballPos)
-    , ball 2 (model ^. #ballPos)
-    , text_ [x_ "200", y_ "200"] [text ("Mouse at " <> ms (model ^. #mouseAt . to show))]
-    ]
-  ]
+  -- [ Miso.style_ (Map.fromList [("margin", "0px"), ("padding", "0px"), ("border", "0px")]) ]
+  [ class_ "container" ]
+  [ div_ [ class_ "row" ]
+    [ div_ [ class_ "col" ]
+      [ Svg.svg_
+        [ Svg.height_ (ms (model ^. #windowSize . _y)), Svg.width_ (ms (model ^. #windowSize . _x)) ]
+        [ ball 50 (model ^. #ballPos)
+        , ball 2 (model ^. #ballPos)
+        , text_ [x_ "200", y_ "200"] [text ("Mouse at " <> ms (model ^. #mouseAt . to show))]
+        ]
+      ] ] ]

@@ -9,8 +9,7 @@ import Miso
 
 import BaseM (runApp)
 import Model
-  ( Action(ShowApp)
-  , AppName(Obfuscate)
+  ( Action(Noop)
   , initModel
   , subsRequired
   , updateModel)
@@ -20,7 +19,7 @@ main :: IO ()
 main =
   runApp $ startApp $ App
   { initialAction =
-      ShowApp Obfuscate
+      Noop
   , Miso.model =
       initModel
   , update =

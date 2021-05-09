@@ -39,6 +39,7 @@ import Miso (Effect, Sub, mapSub)
 
 -- import BaseM (BaseM)
 import qualified Obfuscate.Model
+import qualified Meter.Model
 import qualified Pong.Model
 import qualified State
 
@@ -46,12 +47,14 @@ data AppName
   = Top
   | Obfuscate
   | Pong
+  | Meter
   deriving (Eq, Generic, Show)
 
 data Model =
   Model
   { obfuscate :: Obfuscate.Model.Model
   , pong :: Pong.Model.Model
+  , meter :: Meter.Model.Model
   , selected :: AppName
   }
   deriving (Eq, Generic, Show)
@@ -63,14 +66,18 @@ initModel =
       Obfuscate.Model.initModel
   , pong =
       Pong.Model.initModel
+  , meter =
+      Meter.Model.initModel
   , selected =
-      Top
+      Meter
   }
 
 data Action
-  = ShowApp AppName
+  = Noop
+  | ShowApp AppName
   | PongAction Pong.Model.Action
   | ObfuscateAction Obfuscate.Model.Action
+  | MeterAction Meter.Model.Action
   deriving (Show, Generic, Eq)
 
 -- | Pass on @subAction@ and part of @model@ to the update function,
@@ -95,6 +102,9 @@ liftApp model subAction mkAction subModelLens updateSubModel  =
 updateModel :: Model -> Action -> Effect Action Model
 updateModel model = \case
 
+  Noop ->
+    pure model
+
   ShowApp app ->
     State.noEff model (#selected .= app)
 
@@ -105,6 +115,10 @@ updateModel model = \case
   PongAction action ->
     liftApp model action
     PongAction #pong Pong.Model.updateModel
+
+  MeterAction action ->
+    liftApp model action
+    MeterAction #meter Meter.Model.updateModel
 
 subsRequired :: [Sub Action]
 subsRequired =
