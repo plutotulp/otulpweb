@@ -9,6 +9,7 @@ let
     "${devTools.hlint}/bin/hlint";
 
 in pkg.env.overrideAttrs (old: {
+  buildInputs = old.buildInputs ++ (builtins.attrValues devTools);
   shellHook = ''
     function run-ghcid () {
       target="$1"
