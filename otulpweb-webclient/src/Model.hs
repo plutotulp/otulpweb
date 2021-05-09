@@ -69,7 +69,7 @@ initModel =
   , meter =
       Meter.Model.initModel
   , selected =
-      Meter
+      Top
   }
 
 data Action
