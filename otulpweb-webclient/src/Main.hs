@@ -15,6 +15,15 @@ import Model
   , updateModel)
 import View (viewModel)
 
+-- If main is built with GHC, main is a http server that serves up a
+-- server-side-rendered version of the webclient, with minimal bits of
+-- Javascript executed in the browser.
+--
+-- If main is built with GHCJS, main is a directory of Javascript
+-- files and index.html that runs the webclient in the browser.
+--
+-- Look at the definition of 'runApp' in the "BaseM" module for
+-- details.
 main :: IO ()
 main =
   runApp $ startApp $ App
