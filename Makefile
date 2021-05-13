@@ -22,23 +22,18 @@ clean:
 	-rm -r otulpweb-common/dist otulpweb-common/dist-newstyle
 	-rm -r otulpweb-server/dist otulpweb-server/dist-newstyle
 
-# Serve webclient using ghcid with normal ghc and jsaddle instead of
-# compiling fully with ghcjs. This is much faster, so is very handy
-# during development. It is a bit flakey, though. When it is time to
-# do a real compilation, use target build/webclient.ghc.nix-result or
-# build/webclient.ghcjs.nix-result instead.
+# Run ghcid session for otulpweb-webclient. This is good for spotting
+# errors.
 .PHONY: webclient-dev-ghcid
 webclient-dev-ghcid:
 	cd otulpweb-webclient && nix-shell --run run-ghcid
 
-# Build webclient release code and serve statically at
-# http://localhost:3000. Does not run the otulpweb-server code, but
-# uses an ad-hoc web server instead. Hence, only useful for testing a
-# static client that does not need server-side functionality.
-.PHONY: webclient-dev-server
-webclient-dev-server: build/otulpweb-webclient.ghcjs.nix-result
-	nix-shell -p haskellPackages.wai-app-static --run \
-	'warp -d build/otulpweb-webclient.ghcjs.nix-result/bin/webclient.jsexe -h localhost -p 3000'
+# Like the above, but additionally serves the client at localhost
+# whenever it builds successfully. Does not run the normal backend
+# server, though, so any interactivity with backend will not work.
+.PHONY: webclient-dev-ghcid-server
+webclient-dev-server:
+	cd otulpweb-webclient && nix-shell --run run-ghcid-main
 
 # Run ghcid session for otulpweb-common.
 .PHONY: common-dev-ghcid
