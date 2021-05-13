@@ -53,7 +53,7 @@ viewModel model =
 
   , div_ [ class_ "row" ]
     [ div_ [ class_ "col" ]
-      [ h2_ [] [ text "Vigenére"]
+      [ h2_ [] [ text "Vigenère"]
       , p_ [] [ text "Nøkkel"
               , input_ [ onInput SetVigenerePassword
                        , value_ vigPwd' ] ]
