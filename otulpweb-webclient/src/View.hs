@@ -1,3 +1,4 @@
+{-# language CPP #-}
 {-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
 
@@ -56,9 +57,27 @@ breadcrumbs selectedAppName =
           , onClick (ShowApp name)]
       [ (text . toLower . ms . show) name ]
 
+-- Links to external bootstrap CSS and JS. When building for release
+-- with GHCJS, this is just an empty list, and we instead rely on
+-- bundling these files and refering to them in index.html. During
+-- development, and building with plain GHC, this is a of external
+-- links bringing in Bootstrap CSS and JS, because with these builds
+-- we simply don't have control of index.html, and cannot put these
+-- links there.
+bootstrapLinks :: [View Action]
+bootstrapLinks =
+#ifndef __GHCJS__
+  [ link_ [ href_ "https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+          , rel_ "stylesheet" ]
+  , script_ [ src_ "https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" ] "" ]
+#else
+  []
+#endif
+
 viewModel :: Model -> View Action
 viewModel model =
   div_ [ class_ "container" ]
+  $ bootstrapLinks ++
   [ breadcrumbs (model ^. #selected)
   , case model ^. #selected of
       Top ->
