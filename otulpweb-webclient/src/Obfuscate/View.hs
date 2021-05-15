@@ -13,59 +13,62 @@ import Miso hiding (model)
 import Miso.String
 -- import Miso.Svg
 -- import qualified Miso.Svg as Svg
+import qualified Data.Map as Map
 
 import Obfuscate.Model (Model(..), Action(..), RotKey(..), msVigKey)
 
 ct_ :: MisoString -> [View Action]
 ct_ str =
-  [ text "CT: ", span_ [ class_ "text-danger" ] [ text str ] ]
+  [ text "> ", span_ [ class_ "text-danger", style_ breakAnywhere ] [ text str ] ]
+  where
+    breakAnywhere = Map.singleton "line-break" "anywhere"
 
-pt_ :: MisoString -> [View Action]
-pt_ str =
-  [ text "PT: ", span_ [ class_ "text-muted" ] [ text str ] ]
+-- pt_ :: MisoString -> [View Action]
+-- pt_ str =
+--   [ text "PT ", span_ [ class_ "text-muted" ] [ text str ] ]
 
 viewModel :: Model -> View Action
 viewModel model =
   div_ [ class_ "container" ]
   [ div_ [ class_ "row" ]
     [ div_ [ class_ "col" ]
-      [ h1_ [] [ text "Krypto" ]
-      , h2_ [] [ text "Hemmelig melding"]
-      , p_  [ class_ "lead" ] [ text "Skriv din hemmelige melding her" ]
-      , textarea_ [ onInput SetInput
-                  , value_ $ model ^. #inputText ] [] ] ]
+      [ h1_ [] [ text "Krypto" ] ] ]
+
+  ,  div_ [ class_ "row" ]
+     [ textarea_ [ class_ "col"
+                 , onInput SetInput
+                 , rows_ "3"
+                 , placeholder_ "hemmelig melding" ] [] ]
 
   , div_ [ class_ "row" ]
     [ div_ [ class_ "col" ]
-      [ h2_ [] [ text "Som tall"]
-      , p_ [] (ct_ numCt')
-      , p_ [] (pt_ numPt') ] ]
+      [ h2_ [] [ text "Tall"]
+      , p_ [] (ct_ numCt') ] ]
 
   , div_ [ class_ "row" ]
     [ div_ [ class_ "col" ]
       [ h2_ [] [ text "ROT"]
-      , p_ [] [ text "Nøkkel"
-              , input_ [ onInput SetRotKey
+      , p_ [] [ input_ [ onInput SetRotKey
                        , maxlength_ "9" -- Invalid numbers above this length
-                       , value_ (ms rotKey') ] ]
-      , p_ [] (ct_ rotCt')
-      , p_ [] (pt_ rotPt') ] ]
+                       , value_ (ms (if rotKey' == 0 then "" else show rotKey'))
+                       , placeholder_ "heltall"
+                       , type_ "number" ] ]
+      , p_ [] (ct_ rotCt') ] ]
 
   , div_ [ class_ "row" ]
     [ div_ [ class_ "col" ]
       [ h2_ [] [ text "Vigenère"]
-      , p_ [] [ text "Nøkkel"
-              , input_ [ onInput SetVigenerePassword
-                       , value_ vigPwd' ] ]
-      , p_ [] (ct_ vigCt')
-      , p_ [] (pt_ vigPt') ] ] ]
+      , p_ [] [ input_ [ onInput SetVigenerePassword
+                       , placeholder_ "passord" ] ]
+      , p_ [] [ text "K ", span_ [ class_ "text-muted" ] [ text vigPwd' ] ]
+      , p_ [] (ct_ vigCt') ] ] ]
 
   where
     rotKey' = model ^. #rotKey . to unRotKey
     rotCt'  = model ^. #rotCt
-    rotPt'  = model ^. #rotPt
+    -- rotPt'  = model ^. #rotPt
     numCt'  = model ^. #numCt
-    numPt'   =model ^. #numPt . to ms
+    -- numPt'   =model ^. #numPt . to ms
     vigPwd' = model ^. #vigKey . to msVigKey
     vigCt'  = model ^. #vigCt
-    vigPt'  = model ^. #vigPt
+    -- vigPt'  = model ^. #vigPt

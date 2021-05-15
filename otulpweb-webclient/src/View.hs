@@ -12,7 +12,7 @@ import Control.Lens
 import Miso hiding (model)
 import Miso.String
 
-import Model (AppName(..), Action(..), Model(..))
+import Model (AppName(..), msAppName, Action(..), Model(..))
 
 import qualified Meter.View
 import qualified Obfuscate.View
@@ -49,13 +49,15 @@ breadcrumbs selectedAppName =
     chosen' name =
       li_ [ class_ "breadcrumb-item active"
           , prop "aria-current" ("page" :: String)
+          , textProp "role" "button"
           , onClick (ShowApp name) ]
-      [ (text . toLower . ms . show) name ]
+      [ (text . toLower . msAppName) name ]
 
     normal name =
       li_ [ class_ "breadcrumb-item"
+          , textProp "role" "button"
           , onClick (ShowApp name)]
-      [ (text . toLower . ms . show) name ]
+      [ (text . toLower . msAppName) name ]
 
 -- Links to external bootstrap CSS and JS. When building for release
 -- with GHCJS, this is just an empty list, and we instead rely on

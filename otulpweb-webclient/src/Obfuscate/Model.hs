@@ -82,8 +82,8 @@ initModel =
   , vigPt = ""
   }
   where
-    rk = 13
-    vk = Vig.mkVigKey "passord"
+    rk = 0
+    vk = Vig.mkVigKey ""
 
 data Action
   = Encrypt
@@ -98,7 +98,7 @@ updateModel model = \case
     Encrypt -> do
       State.noEff model $ do
 
-        let pt = Rot.validText (model ^. #inputText . to fromMisoString)
+        let pt = model ^. #inputText . to fromMisoString
 
         #plainText .= ms pt
 
@@ -134,7 +134,7 @@ updateModel model = \case
 
     SetInput (fromMisoString -> inStr) -> do
       State.singleEff model $ do
-        #inputText .= ms @String (toLower <$> inStr)
+        #inputText .= ms @String (Rot.validText (toLower <$> inStr))
         pure (pure Encrypt)
 
 msVigKey :: VigKey -> MisoString

@@ -8,6 +8,7 @@ module Model
   ( -- * Model and its lenses.
     Model(..)
   , AppName(..)
+  , msAppName
 
   -- * Create and update model.
   , initModel
@@ -34,7 +35,7 @@ import GHC.Generics (Generic)
 -- import Miso (Effect, (<#), noEff, KeyCode)
 import Miso (Effect, Sub, mapSub)
 -- import qualified Miso.String
--- import Miso.String (MisoString)
+import Miso.String (MisoString, ms)
 -- import Text.Read (readMaybe)
 
 -- import BaseM (BaseM)
@@ -49,6 +50,13 @@ data AppName
   | Pong
   | Meter
   deriving (Eq, Generic, Show)
+
+msAppName :: AppName -> MisoString
+msAppName = ms . \case
+  Top -> "topp"
+  Obfuscate -> "obfuskér"
+  Pong -> "poing"
+  Meter -> "meter"
 
 data Model =
   Model
@@ -69,7 +77,7 @@ initModel =
   , meter =
       Meter.Model.initModel
   , selected =
-      Top
+      Obfuscate
   }
 
 data Action
