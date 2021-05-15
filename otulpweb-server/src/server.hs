@@ -3,6 +3,7 @@
 -- not showing the updated client after recompilations.
 
 {-# language DataKinds #-}
+{-# language OverloadedStrings #-}
 {-# language TypeOperators #-}
 
 import Servant.API
@@ -11,8 +12,8 @@ import Servant
 -- import Network.Wai
 import Network.Wai.Handler.Warp
 -- import Data.Proxy
-import WaiAppStatic.Storage.Filesystem (webAppSettingsWithLookup)
--- import WaiAppStatic.Types (MaxAge(NoMaxAge), )
+import WaiAppStatic.Storage.Filesystem (defaultWebAppSettings)
+import WaiAppStatic.Types (StaticSettings(ssIndices), unsafeToPiece)
 
 type API =
   "healthcheck" :> Get '[JSON] [String]
@@ -23,10 +24,12 @@ api = Proxy
 
 serveDirectory' :: FilePath -> ServerT Raw m
 serveDirectory' dir =
-  serveDirectoryWith (webAppSettingsWithLookup dir noCache)
+  serveDirectoryWith settings
   where
-    noCache =
-      const (pure Nothing)
+    settings =
+      (defaultWebAppSettings dir) { ssIndices = indices }
+    indices =
+      [ unsafeToPiece "index.html"]
 
 serveHealthcheck :: Handler [String]
 serveHealthcheck =
@@ -34,12 +37,13 @@ serveHealthcheck =
 
 server :: Server API
 server =
-  serveHealthcheck :<|> serveDirectory' "result/bin/app.jsexe/"
+  serveHealthcheck :<|> serveDirectory' "static/"
 
 app :: Application
 app =
   serve api server
 
 main :: IO ()
-main =
+main = do
+  putStrLn "Running on http://localhost:8080"
   run 8080 app
