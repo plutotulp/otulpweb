@@ -1,5 +1,5 @@
 .PHONY: all
-all:	build/otulpweb-webclient.ghcjs.nix-result build/otulpweb-server.nix-result
+all:	build/otulpweb-deployment.nix-result
 
 # We'll put all build symlinks in here.
 build:
