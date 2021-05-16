@@ -10,10 +10,10 @@ module Meter.View
 
 -- import Data.String.Interpolate (i)
 import Miso hiding (model)
--- import Miso.String
+import Miso.String (ms)
 -- import Miso.Svg
 -- import qualified Miso.Svg as Svg
-import qualified Data.Text as Text
+-- import qualified Data.Text as Text
 -- import Miso.Subscription.History
 
 import Meter.Model (Model(..), Action(..))
@@ -32,4 +32,4 @@ viewModel (M mUri) =
   [ div_ [ class_ "row" ]
     [ div_ [ class_ "col" ]
       [ h1_ [] [ text "Meter" ]
-      , p_ [] [ maybe (text "no URI") (text . Text.pack . show) mUri ] ] ] ]
+      , p_ [] [ maybe (text "no URI") (text . ms . show) mUri ] ] ] ]

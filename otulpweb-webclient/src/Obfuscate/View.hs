@@ -38,6 +38,7 @@ viewModel model =
      [ textarea_ [ class_ "col"
                  , onInput SetInput
                  , rows_ "3"
+                 , value_ (model ^. #inputText)
                  , placeholder_ "hemmelig melding" ] [] ]
 
   , div_ [ class_ "row" ]
@@ -59,6 +60,7 @@ viewModel model =
     [ div_ [ class_ "col" ]
       [ h2_ [] [ text "Vigenère"]
       , p_ [] [ input_ [ onInput SetVigenerePassword
+                       , value_ (model ^. #vigKeyText)
                        , placeholder_ "passord" ] ]
       , p_ [] [ text "K ", span_ [ class_ "text-muted" ] [ text vigPwd' ] ]
       , p_ [] (ct_ vigCt') ] ] ]

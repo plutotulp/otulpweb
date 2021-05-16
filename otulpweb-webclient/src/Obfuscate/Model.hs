@@ -1,5 +1,4 @@
 {-# language DeriveGeneric #-}
-{-# language ViewPatterns #-}
 {-# language LambdaCase #-}
 {-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
@@ -54,6 +53,7 @@ data Model =
   , rotCt :: MisoString
   , rotPt :: MisoString
 
+  , vigKeyText :: MisoString
   , vigKey :: VigKey
   , vigCt :: MisoString
   , vigPt :: MisoString
@@ -69,17 +69,15 @@ initModel =
   , numCt = ""
   , numPt = ""
 
-  , rotKey = rk
+  , rotKey = 0
   , rotCt = ""
   , rotPt = ""
 
-  , vigKey = vk
+  , vigKeyText = ""
+  , vigKey = Vig.mkVigKey ""
   , vigCt = ""
   , vigPt = ""
   }
-  where
-    rk = 0
-    vk = Vig.mkVigKey ""
 
 data Action
   = Encrypt
@@ -91,9 +89,7 @@ data Action
 transition :: Action -> Transition Action Model ()
 transition = \case
   Encrypt -> do
-    pt <- use (#inputText . to fromMisoString)
-
-    #plainText .= ms pt
+    pt <- use (#plainText . to fromMisoString)
 
     let nums = mapMaybe Rot.charToInt pt
     #numCt .= ms (concatMap show nums)
@@ -118,12 +114,15 @@ transition = \case
     #rotKey .= rk
     scheduleIO (pure Encrypt)
 
-  SetVigenerePassword (fromMisoString -> str) -> do
-    #vigKey .= Vig.mkVigKey (toLower <$> str)
+  SetVigenerePassword pwd -> do
+    #vigKeyText .= pwd
+    #vigKey .= Vig.mkVigKey (toLower <$> fromMisoString pwd)
     scheduleIO (pure Encrypt)
 
-  SetInput (fromMisoString -> inStr) -> do
-    #inputText .= ms @String (Rot.validText (toLower <$> inStr))
+  SetInput inStr -> do
+    #inputText .= inStr
+    #plainText .=
+      ms @String (Rot.validText (toLower <$> fromMisoString inStr))
     scheduleIO (pure Encrypt)
 
 updateModel :: Model -> Action -> Effect Action Model
