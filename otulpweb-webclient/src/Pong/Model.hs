@@ -9,6 +9,7 @@ module Pong.Model
 
   -- * Create and update model.
   , initModel
+  , transition
   , updateModel
 
   -- * Actions and their prisms.
@@ -20,29 +21,16 @@ module Pong.Model
   ) where
 
 import Control.Lens
-import Linear.V2
 import Linear.Affine
 import Linear.Metric
+import Linear.V2
 
--- import Control.Monad.State (State, StateT, execState, runStateT)
--- import Control.Monad.State (State, execState)
--- import qualified Data.Char as Char
--- import qualified Data.List as List
--- import Data.Map.Strict (Map)
--- import qualified Data.Map.Strict as Map
 import Data.Generics.Labels ()
--- import Data.Maybe (fromMaybe)
 import GHC.Generics (Generic)
--- import Miso (Effect, (<#), noEff, KeyCode(KeyCode))
-import Miso (Effect, Sub)
--- import qualified Miso.String
--- import Miso.String (MisoString, ms)
--- import Text.Read (readMaybe)
+import Miso (Effect, Sub, Transition, fromTransition, scheduleIO)
 import Miso.Subscription.Keyboard (Arrows(..), arrowsSub, wasdSub)
 import Miso.Subscription.Mouse (mouseSub)
 import Miso.Subscription.Window (windowCoordsSub)
-
-import qualified State
 
 data Model =
   Model
@@ -72,53 +60,46 @@ data Action
   | ChaseMouse
   deriving (Show, Generic, Eq)
 
-updateModel :: Model -> Action -> Effect Action Model
-updateModel model = \case
-
+transition :: Action -> Transition Action Model ()
+transition = \case
   ArrowArrows arrows -> do
-    State.singleEff model $ do
-      pure (pure (WasdArrows arrows))
+    scheduleIO (pure (WasdArrows arrows))
 
   WasdArrows arrows -> do
-    State.noEff model $ do
-      let
-        delta =
-          V2
-          (fromIntegral (arrowX arrows) * 10)
-          (fromIntegral (negate (arrowY arrows)) * 10)
-      #ballPos %= (+ delta)
+    let
+      delta =
+        V2
+        (fromIntegral (arrowX arrows) * 10)
+        (fromIntegral (negate (arrowY arrows)) * 10)
+    #ballPos %= (+ delta)
 
   MousePos (x, y) -> do
-    State.singleEff model $ do
-      let
-        mrg =
-          model ^. #bodyMargin
-      #mouseAt .= V2 (x-mrg) (y-mrg)
-      pure (pure ChaseMouse)
+    mrg <- use #bodyMargin
+    #mouseAt .= V2 (x-mrg) (y-mrg)
+    scheduleIO (pure ChaseMouse)
 
   WindowSize (h, w) -> do
-    State.noEff model $ do
-      #windowSize .= V2 w h
+    #windowSize .= V2 w h
 
   ChaseMouse -> do
+    mp <- use (#mouseAt . to (fmap fromIntegral))
+    bp <- use #ballPos
     let
-      mp =
-        fromIntegral <$> model ^. #mouseAt
-      bp =
-        model ^. #ballPos
       doNothing =
-        pure model
+        pure ()
       moveCloser = do
         let
           dist =
             distanceA mp bp
           diff =
             (* min dist 5) <$> normalize (mp .-. bp)
-        State.singleEff model $ do
-          #ballPos %= (+diff)
-          pure (pure ChaseMouse)
+        #ballPos %= (+diff)
+        scheduleIO (pure ChaseMouse)
 
     if distanceA mp bp < 0.5 then doNothing else moveCloser
+
+updateModel :: Model -> Action -> Effect Action Model
+updateModel m a = fromTransition (transition a) m
 
 subsRequired :: [Sub Action]
 subsRequired =

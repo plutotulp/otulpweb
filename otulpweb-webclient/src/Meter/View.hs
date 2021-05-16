@@ -13,6 +13,8 @@ import Miso hiding (model)
 -- import Miso.String
 -- import Miso.Svg
 -- import qualified Miso.Svg as Svg
+import qualified Data.Text as Text
+-- import Miso.Subscription.History
 
 import Meter.Model (Model(..), Action(..))
 
@@ -25,8 +27,9 @@ import Meter.Model (Model(..), Action(..))
 --   [ text "PT: ", span_ [ class_ "text-muted" ] [ text str ] ]
 
 viewModel :: Model -> View Action
-viewModel _ =
+viewModel (M mUri) =
   div_ [ class_ "container" ]
   [ div_ [ class_ "row" ]
     [ div_ [ class_ "col" ]
-      [ h1_ [] [ text "Meter" ] ] ] ]
+      [ h1_ [] [ text "Meter" ]
+      , p_ [] [ maybe (text "no URI") (text . Text.pack . show) mUri ] ] ] ]
