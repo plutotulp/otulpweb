@@ -32,7 +32,7 @@ webclient-dev-ghcid:
 # whenever it builds successfully. Does not run the normal backend
 # server, though, so any interactivity with backend will not work.
 .PHONY: webclient-dev-ghcid-server
-webclient-dev-server:
+webclient-dev-ghcid-server:
 	cd otulpweb-webclient && nix-shell --run run-ghcid-main
 
 # Run ghcid session for otulpweb-common.
@@ -49,3 +49,8 @@ common-dev-ghcid-tasty:
 .PHONY: server-dev-ghcid
 server-dev-ghcid:
 	cd otulpweb-server && nix-shell --run run-ghcid
+
+# Run ghcid session for otulpweb-server.
+.PHONY: server-dev-ghcid
+server-dev-ghcid-server:
+	cd otulpweb-server && nix-shell --run run-ghcid-main
