@@ -22,23 +22,9 @@ import WaiAppStatic.Storage.Filesystem (defaultWebAppSettings)
 import WaiAppStatic.Types (StaticSettings(ssIndices), unsafeToPiece)
 import Text.InterpolatedString.Perl6 (qc)
 
+import OtulpWeb.Common.Api
 import ConfigCli
 import ConfigFile
-
-type ApiV1 =
-  "metric" :> Get '[PlainText] Text
-  :<|>
-  "show" :> Get '[JSON] Text
-
-type Api =
-  "v1" :> ApiV1
-
-type TopLevelRoutes =
-  "healthcheck" :> Get '[PlainText] Text
-  :<|>
-  "api" :> Api
-  :<|>
-  Raw
 
 serveDirectory' :: FilePath -> ServerT Raw m
 serveDirectory' dir =
@@ -65,8 +51,8 @@ serveApiV1 cfg =
   serveApiV1Metric cfg :<|> serveApiV1Show cfg
 
 serveApi :: ConfigFile -> Server Api
-serveApi cfg =
-  serveApiV1 cfg
+serveApi =
+  serveApiV1
 
 server :: ConfigFile -> Server TopLevelRoutes
 server cfg =
