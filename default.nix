@@ -137,7 +137,7 @@ in let
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
-      ExecStart = "${otulpweb-deployment}/otulpweb-server --config config.dhall +RTS -N";
+      ExecStart = "${otulpweb-deployment}/otulpweb-server --config ${otulpweb-deployment}/config.dhall +RTS -N";
       Restart = "always";
     };
   };
