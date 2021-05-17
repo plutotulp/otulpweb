@@ -144,11 +144,19 @@ in let
 
 in {
 
+  # Package sets.
   inherit miso pkgs;
-  inherit cfg src devTools;
-  inherit otulpweb-common otulpweb-webclient otulpweb-server otulpweb-deployment;
 
-  # For NixOS
-  inherit otulpweb-service;
+  inherit cfg src devTools;
+
+  # Derivations for the cabal projects.
+  inherit otulpweb-common otulpweb-webclient otulpweb-server;
+
+
+  # For NixOS. In /etc/nixos/config.nix:
+  #
+  #   systemd.services.otulpweb = (import /path/to/this/dir {}).otulpweb-service;
+  #
+  inherit otulpweb-deployment otulpweb-service;
 
 }
