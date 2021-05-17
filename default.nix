@@ -127,7 +127,7 @@ in let
     cp -v $client/all.js $out/static/
 
     cp -v $src/config.dhall $out/
-    cp -v $server/bin/server $out/
+    cp -v $server/bin/server $out/otulpweb-server
     '';
 
 in let
@@ -138,18 +138,26 @@ in let
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       WorkingDirectory = "${otulpweb-deployment}";
-      ExecStart = "${otulpweb-deployment}/server --config config.dhall +RTS -N -S";
+      ExecStart = "${otulpweb-deployment}/otulpweb-server --config config.dhall +RTS -N";
       Restart = "always";
     };
   };
 
 in {
 
+  # Package sets.
   inherit miso pkgs;
-  inherit cfg src devTools;
-  inherit otulpweb-common otulpweb-webclient otulpweb-server otulpweb-deployment;
 
-  # For NixOS
-  inherit otulpweb-service;
+  inherit cfg src devTools;
+
+  # Derivations for the cabal projects.
+  inherit otulpweb-common otulpweb-webclient otulpweb-server;
+
+
+  # For NixOS. In /etc/nixos/config.nix:
+  #
+  #   systemd.services.otulpweb = (import /path/to/this/dir {}).otulpweb-service;
+  #
+  inherit otulpweb-deployment otulpweb-service;
 
 }
