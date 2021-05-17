@@ -71,25 +71,30 @@
 
 * Tasks remaining [0/2]
 
-** TODO Build server
-   Currently, =make all= just builds the webclient. The server has not
-   seen much love yet, because it isn't really needed. The webclient
-   is currently a static app.
+** TODO Database library
+   Somme Contenders:
+   - hasql :: Nikita Volkov. Claims to be fast. I *think* it comes
+     with migrations support. Supports only Postgresql, I think.
+   - beam :: Looks fancy. Supports multiple primary keys, yey!
+     Migrations. Seems a bit like the esqelito (or whatever it's
+     called), but more capable? Supports Sqlite and Postresql, maybe
+     more. Has [[https://haskell-beam.github.io/beam/][nice docs]]!
+   - persistent :: Popular, I think? Weird primary key demands, I seem
+     to recall. I thnk there's some migration strategy. Pairs with
+     esqueleto (or whatever it's called) for typed queries, but I
+     remember these becoming unwieldy. Supports at least Sqlite and
+     Postgres, maybe more.
 
-** TODO Integrate deployment into server nix config
-   We do builds with nix, but it sure would be nice to deploy with nix
-   as well. I'm not sure how to solve this, but thinking I could
-   probably make a NixOS module and source it from
-   configuration.nix. It should support fixing at some git tag/ref.
+** TODO Data dir
+   Should probably make default.nix' otulpweb-service setup a var
+   directory as well, and put a sqlite db there. Or maybe use
+   postgresql. Either, way, storage is next.
 
-** TODO Make server nix-depend on client
-   Right now, server just serves whatever is in some directory, and
-   seems to be caching aggressively, so just rebuilding the client
-   does not mean the server caught up with the new stuff. This is why
-   the server code just gets ignored at the moment and the
-   =webclient-dev-server= Make target uses the stand-alone
-   =haskellPackages.wai-app-static= server instead.
-
-   Update: Long time since I looked at the server code. Could perhaps
-   have a look at how otulpweb-common gets built by otulpweb-webclient
-   and re-use that?
+** TODO Authentication?
+   This can probably wait. For the Meter app, I could perhaps extract
+   a unique ID from your web client / phone and just key data by that?
+   Or you choose your own username, and we keep it in the browser's
+   local storage as long as possible? Could just make sure to store
+   enough metadata along with the metrics to possibly filter out any
+   rogue data afterwards. Key thing for Meter: must be super easy to
+   register metrics!
