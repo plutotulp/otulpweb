@@ -10,7 +10,6 @@ module Pong.Model
   -- * Create and update model.
   , initModel
   , transition
-  , updateModel
 
   -- * Actions and their prisms.
   , Action(..)
@@ -27,7 +26,7 @@ import Linear.V2
 
 import Data.Generics.Labels ()
 import GHC.Generics (Generic)
-import Miso (Effect, Sub, Transition, fromTransition, scheduleIO)
+import Miso (Sub, Transition, scheduleIO)
 import Miso.Subscription.Keyboard (Arrows(..), arrowsSub, wasdSub)
 import Miso.Subscription.Mouse (mouseSub)
 import Miso.Subscription.Window (windowCoordsSub)
@@ -97,9 +96,6 @@ transition = \case
         scheduleIO (pure ChaseMouse)
 
     if distanceA mp bp < 0.5 then doNothing else moveCloser
-
-updateModel :: Model -> Action -> Effect Action Model
-updateModel m a = fromTransition (transition a) m
 
 subsRequired :: [Sub Action]
 subsRequired =

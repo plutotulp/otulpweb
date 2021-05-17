@@ -11,7 +11,7 @@ import Control.Lens
 
 import Data.Generics.Labels ()
 import GHC.Generics (Generic)
-import Miso (Effect, Sub, Transition, fromTransition, scheduleIO)
+import Miso (Sub, Transition, scheduleIO)
 import Miso.Subscription.History (URI, uriSub, getCurrentURI)
 
 data Model =
@@ -31,9 +31,6 @@ transition = \case
     #currentURI .= Just uri
   GetURI ->
     scheduleIO (UpdateURI <$> getCurrentURI)
-
-updateModel :: Model -> Action -> Effect Action Model
-updateModel m a = fromTransition (transition a) m
 
 data Action
   = Noop

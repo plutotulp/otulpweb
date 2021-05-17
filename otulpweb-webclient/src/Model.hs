@@ -12,7 +12,7 @@ module Model
 
   -- * Create and update model.
   , initModel
-  , updateModel
+  , transition
 
   -- * Actions and their prisms.
   , Action(..)
@@ -27,7 +27,7 @@ import Control.Monad
 
 import Data.Generics.Labels ()
 import GHC.Generics (Generic)
-import Miso (Effect, Sub, mapSub, Transition, fromTransition, mapAction, scheduleIO)
+import Miso (Sub, mapSub, Transition, mapAction, scheduleIO)
 import Miso.String (MisoString, ms)
 
 import qualified Obfuscate.Model
@@ -100,9 +100,6 @@ transition = \case
   where
     zoomApp l aw t a =
       zoom l (mapAction aw (t a))
-
-updateModel :: Model -> Action -> Effect Action Model
-updateModel model action = fromTransition (transition action) model
 
 subsRequired :: [Sub Action]
 subsRequired =

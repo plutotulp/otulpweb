@@ -15,7 +15,6 @@ module Obfuscate.Model
   -- * Create and update model.
   , initModel
   , transition
-  , updateModel
 
   -- * Actions and their prisms.
   , Action(..)
@@ -31,7 +30,7 @@ import Data.Char
 import Data.Generics.Labels ()
 import Data.Maybe (mapMaybe, fromMaybe)
 import GHC.Generics (Generic)
-import Miso (Effect, Transition, fromTransition, scheduleIO)
+import Miso (Transition, scheduleIO)
 import qualified Miso.String
 import Miso.String (MisoString, fromMisoString, ms)
 import Text.Read (readMaybe)
@@ -124,9 +123,6 @@ transition = \case
     #plainText .=
       ms @String (Rot.validText (toLower <$> fromMisoString inStr))
     scheduleIO (pure Encrypt)
-
-updateModel :: Model -> Action -> Effect Action Model
-updateModel m a = fromTransition (transition a) m
 
 msVigKey :: VigKey -> MisoString
 msVigKey =

@@ -5,6 +5,7 @@ import Miso
   , LogLevel(..)
   , defaultEvents
   , startApp
+  , fromTransition
   )
 
 import BaseM (runApp)
@@ -12,7 +13,7 @@ import Model
   ( Action(Noop)
   , initModel
   , subsRequired
-  , updateModel)
+  , transition)
 import View (viewModel)
 
 -- If main is built with GHC, main is a http server that serves up a
@@ -32,7 +33,7 @@ main =
   , Miso.model =
       initModel
   , update =
-      flip updateModel
+      fromTransition . transition
   , Miso.view =
       viewModel
   , events =
