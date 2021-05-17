@@ -127,7 +127,7 @@ in let
     cp -v $client/all.js $out/static/
 
     cp -v $src/config.dhall $out/
-    cp -v $server/bin/server $out/
+    cp -v $server/bin/server $out/otulpweb-server
     '';
 
 in let
@@ -137,7 +137,7 @@ in let
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
-      ExecStart = "${otulpweb-deployment}/server --config config.dhall +RTS -N -S";
+      ExecStart = "${otulpweb-deployment}/otulpweb-server --config config.dhall +RTS -N";
       Restart = "always";
     };
   };
