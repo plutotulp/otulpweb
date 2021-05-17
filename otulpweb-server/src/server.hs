@@ -1,49 +1,94 @@
--- FIXME: Thought to use this to serve up client during development,
--- but was unable to keep it from caching everything to the point of
--- not showing the updated client after recompilations.
-
+{-# language QuasiQuotes #-}
 {-# language DataKinds #-}
 {-# language OverloadedStrings #-}
+{-# language TypeApplications #-}
 {-# language TypeOperators #-}
+{-# language OverloadedLabels #-}
 
 import Servant.API
 import Servant
+import Control.Lens
+import System.Exit
+import System.IO
+
+-- import qualified Data.Text as Text
+import Data.Text (Text)
+import qualified Data.Text.IO as Text
 -- import Servant.Server.StaticFiles
 -- import Network.Wai
 import Network.Wai.Handler.Warp
 -- import Data.Proxy
 import WaiAppStatic.Storage.Filesystem (defaultWebAppSettings)
 import WaiAppStatic.Types (StaticSettings(ssIndices), unsafeToPiece)
+import Text.InterpolatedString.Perl6 (qc)
 
-type API =
-  "healthcheck" :> Get '[JSON] [String]
-  :<|> Raw
+import ConfigCli
+import ConfigFile
 
-api :: Proxy API
-api = Proxy
+type ApiV1 =
+  "metric" :> Get '[PlainText] Text
+  :<|>
+  "show" :> Get '[JSON] Text
+
+type Api =
+  "v1" :> ApiV1
+
+type TopLevelRoutes =
+  "healthcheck" :> Get '[PlainText] Text
+  :<|>
+  "api" :> Api
+  :<|>
+  Raw
 
 serveDirectory' :: FilePath -> ServerT Raw m
 serveDirectory' dir =
   serveDirectoryWith settings
   where
     settings =
-      (defaultWebAppSettings dir) { ssIndices = indices }
-    indices =
-      [ unsafeToPiece "index.html"]
+      (defaultWebAppSettings dir)
+      { ssIndices = [ unsafeToPiece "index.html"] }
 
-serveHealthcheck :: Handler [String]
+serveHealthcheck :: Handler Text
 serveHealthcheck =
-  pure ["Halla", "Balla"]
+  pure "Server is healthy"
 
-server :: Server API
-server =
-  serveHealthcheck :<|> serveDirectory' "static/"
+serveApiV1Metric :: ConfigFile -> Handler Text
+serveApiV1Metric _cfg =
+  pure "You need to post some metrics"
 
-app :: Application
-app =
-  serve api server
+serveApiV1Show :: ConfigFile -> Handler Text
+serveApiV1Show _cfg =
+  pure "Showing EVERYTHING"
+
+serveApiV1 :: ConfigFile -> Server ApiV1
+serveApiV1 cfg =
+  serveApiV1Metric cfg :<|> serveApiV1Show cfg
+
+serveApi :: ConfigFile -> Server Api
+serveApi cfg =
+  serveApiV1 cfg
+
+server :: ConfigFile -> Server TopLevelRoutes
+server cfg =
+  serveHealthcheck :<|>
+  serveApi cfg :<|>
+  serveDirectory' (cfg ^. #clientFilePath)
+
+app :: ConfigFile -> Application
+app cfg =
+  serve @TopLevelRoutes Proxy (server cfg)
+
+-- FIXME: Use a proper logger instead of hPutStrLn
 
 main :: IO ()
 main = do
-  putStrLn "Running on http://localhost:8080"
-  run 8080 app
+  cli <- parseCli
+  mCfg <- readConfigFile (cli ^. #configFile)
+  case mCfg of
+    Left err -> do
+      Text.hPutStrLn stderr (ppConfigError err)
+      exitFailure
+    Right cfg -> do
+      let port = cfg ^. #listenPort . to fromIntegral
+      Text.hPutStrLn stderr [qc|Running on http://0.0.0.0:{port}|]
+      run port (app cfg)

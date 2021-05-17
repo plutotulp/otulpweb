@@ -16,10 +16,20 @@ executable server
   hs-source-dirs:   src
   ghc-options:      -Wall -threaded -rtsopts
   main-is:          server.hs
+  other-modules:    ConfigCli
+                  , ConfigFile
   build-depends:    base
                   , otulpweb-common
+                  , bytestring
+                  , dhall
+                  , exceptions
+                  , generic-lens
+                  , interpolatedstring-perl6
+                  , lens
+                  , optparse-applicative
                   , servant
                   , servant-server
-                  , warp
+                  , text
                   , wai
                   , wai-app-static
+                  , warp
