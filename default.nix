@@ -126,13 +126,29 @@ in let
     cp -v $bootstrap_css_map $out/static/bootstrap.min.css.map
     cp -v $client/all.js $out/static/
 
+    cp -v $src/config.dhall $out/
     cp -v $server/bin/server $out/
     '';
+
+in let
+
+  otulpweb-service = {
+    description = "Otulpweb server";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "${otulpweb-deployment}/server --config config.dhall +RTS -N -S";
+      Restart = "always";
+    };
+  };
 
 in {
 
   inherit miso pkgs;
   inherit cfg src devTools;
   inherit otulpweb-common otulpweb-webclient otulpweb-server otulpweb-deployment;
+
+  # For NixOS
+  inherit otulpweb-service;
 
 }
