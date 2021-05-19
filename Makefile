@@ -43,7 +43,7 @@ common-dev-ghcid:
 # Run ghcid session for otulpweb-common's test suite.
 .PHONY: common-dev-ghcid-tasty
 common-dev-ghcid-tasty:
-	cd otulpweb-common && nix-shell --run 'run-ghcid test:tasty'
+	cd otulpweb-common && nix-shell --run 'run-ghcid-main test:tasty'
 
 # Run ghcid session for otulpweb-server.
 .PHONY: server-dev-ghcid
