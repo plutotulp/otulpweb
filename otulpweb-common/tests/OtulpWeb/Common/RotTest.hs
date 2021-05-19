@@ -16,7 +16,6 @@ import Test.Tasty.HUnit
 
 import Data.Sequence (Seq)
 import Data.Maybe (isNothing, isJust)
--- import Test.Tasty.QuickCheck (Arbitrary)
 import Test.Tasty.QuickCheck as QC
 
 import qualified OtulpWeb.Common.Rot as Rot

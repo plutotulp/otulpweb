@@ -2,15 +2,9 @@
 
 module OtulpWeb.Common.VigenereTest (tests) where
 
--- import Control.Monad
 import Data.Char
--- import Data.Foldable
 import Test.Tasty
--- import Test.Tasty.HUnit
 
--- import Data.Sequence (Seq)
--- import Data.Maybe (isNothing, isJust)
--- import Test.Tasty.QuickCheck (Arbitrary)
 import Test.Tasty.QuickCheck as QC
 
 import OtulpWeb.Common.RotTest (ValidChar(..))
