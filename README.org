@@ -1,5 +1,6 @@
 #+TITLE: www.otulp.net
 #+OPTIONS: ^:{} toc:nil
+#+LANGUAGE: en
 
 * Overview
   Server and client code for the www.otulp.net web site.
@@ -7,10 +8,6 @@
   Client in this case basically means the web site contents. The idea
   is that the server supplies the client code at the root path, and
   otherwise acts as an API server for the client.
-
-  In practice, the client has no need for the server for now; the
-  server basically does nothing. What you get at https://www.otulp.net
-  is just the client served by nginx.
 
 * Prerequisites
   - Nix :: Get it at https://nixos.org
@@ -23,15 +20,15 @@
   Well, nix can of course provide the latter two.
 
 * Build
-  Enable =miso= =cachix= cache. May need additional configuration that
-  I don't remember anymore.
+  Enable =miso= =cachix= cache. This is not a strict requirement, it
+  just speeds up initial builds.
 
   #+begin_src shell
     cachix use miso
   #+end_src
 
-  Build both =server= and =webclient= code in the =build= directory,
-  using =nix=.
+  Build a =server= deployment in the =build= directory, using =nix=.
+  This includes building the client.
 
   #+begin_src shell
     make
@@ -40,34 +37,36 @@
 * Development builds
   During client development, it is sure nice to be able to iterate a
   bit faster than GHCJS allows for. The =SOMETHING-dev-ghcid= PHONY
-  targes run a ghcid session with the normal GHC compiler and
-  hlint. This makes it possible to verify that code compiles, quickly
+  targes run a ghcid session with the normal GHC compiler and hlint.
+  This makes it possible to verify that code compiles, quickly
   recompiling when code changes.
 
+  In addition, a =-server= suffix on the dev build target includes
+  running the (unoptimized) code in a dev server at
+  http://0.0.0.0:8080.
+
+  For =otulpweb-client=, this actually means running all the
+  would-be-javascript logic server-side on the dev server and sending
+  UI updates to the browser. It makes the edit-compile-run cycle short
+  and sweet, but doesn't work at all with Firefox and sometimes wigs
+  out a bit.
+
+  For =otulpweb-server=, this means serving whatever is at
+  =build/otulpweb-deployment.nix-result/static= as the client.
+
   #+begin_src shell
-    # work on client code
+    # Work on client code, just looking for compiler/linting messages.
     make webclient-ghcid
 
-    # work on common code
+    # Work on client code, trying to see what happens when the code runs.
+    make webclient-ghcid-server
+
+    # Work on common code.
     make common-ghcid
 
-    # work on common code tests
+    # Work on common code tests.
     make common-ghcid-tasty
   #+end_src
-
-  All the above will tell you if code compiles, and provide linting,
-  but will not *run* the code. To build a release version of the
-  webclient and serve it locally, use a special PHONY target:
-
-  #+begin_src shell
-    # ad-hoc server listens at http://localhost:3000.
-    make webclient-dev-server
-  #+end_src
-
-  Note that this does *not* use otulpweb-server, but rather just
-  builds otulpweb-webclient and serves the static js and html files
-  with wai-app-static. This is because otulpweb-server is not ready
-  for use yet.
 
 * Tasks remaining [0/2]
 
