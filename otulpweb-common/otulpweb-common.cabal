@@ -23,6 +23,7 @@ library
                   , containers
                   , QuickCheck
                   , servant
+                  , svg-builder
                   , text
 
 test-suite tasty

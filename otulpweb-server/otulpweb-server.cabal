@@ -18,18 +18,25 @@ executable server
   main-is:          server.hs
   other-modules:    ConfigCli
                   , ConfigFile
+                  , Tournament
   build-depends:    base
                   , otulpweb-common
                   , bytestring
                   , dhall
                   , exceptions
                   , generic-lens
+                  , http-media
+                  , http-types
                   , interpolatedstring-perl6
                   , lens
                   , optparse-applicative
                   , servant
                   , servant-server
+                  , svg-builder
                   , text
                   , wai
                   , wai-app-static
                   , warp
+                  -- , colour
+                  , diagrams-lib
+                  , diagrams-svg
