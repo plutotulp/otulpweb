@@ -62,7 +62,11 @@ serveApiV1Show _cfg =
 -- correct call.
 serveApiV1Tournament :: ConfigFile -> Int -> Handler SvgElement
 serveApiV1Tournament _cfg n =
-  pure (SvgElement (renderDia SVG (SVGOptions (mkWidth 1000) Nothing "" [] True) (tournament n)))
+  pure
+  (SvgElement
+    (renderDia SVG
+     (SVGOptions (mkWidth 1000) Nothing "" [] True)
+     (tournament n)))
 
 serveApiV1 :: ConfigFile -> Server ApiV1
 serveApiV1 cfg =
