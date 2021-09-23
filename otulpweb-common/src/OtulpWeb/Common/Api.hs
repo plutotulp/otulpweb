@@ -29,3 +29,13 @@ type TopLevelRoutes =
   "api" :> Api
   :<|>
   Raw
+
+-- FIXME: SVG is missing ToSchema instances, so will have to make some
+-- up if the idea is to keep the tournmaent bit in as an API. This
+-- might be easier said than done. Maybe better to not claim
+-- tournament as part of the API. Note also that this here code
+-- requires swagger2 and servant-swagger packages.
+--
+-- apiSwagger :: _
+-- apiSwagger = toSwagger (Proxy @Api)
+--   & info . title .~ "Otulpweb API"

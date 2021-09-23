@@ -1,12 +1,10 @@
-{-# language DataKinds #-}
-{-# language FlexibleInstances #-}
 {-# language MultiParamTypeClasses #-}
 {-# language OverloadedLabels #-}
 {-# language OverloadedStrings #-}
 {-# language QuasiQuotes #-}
 {-# language TypeApplications #-}
-{-# language TypeOperators #-}
 
+-- For the orphan instances of SvgElement (from OtulpWeb.Common.Api)
 {-# options_ghc -Wno-orphans #-}
 
 import Servant.API
