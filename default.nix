@@ -120,6 +120,7 @@ in let
 
     mkdir -p $out/static
     cp -v $src/index.html $out/static/
+    cp -v $src/favicon.ico $out/static/
     cp -v $bootstrap_js      $out/static/bootstrap.bundle.min.js
     cp -v $bootstrap_js_map  $out/static/bootstrap.bundle.min.js.map
     cp -v $bootstrap_css     $out/static/bootstrap.min.css
