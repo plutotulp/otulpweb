@@ -75,7 +75,7 @@ serveApiV1Tournament _cfg n = do
 
 serveApiV1 :: ConfigFile -> Server ApiV1
 serveApiV1 cfg =
-  serveApiV1Metric cfg :<|> serveApiV1Show cfg :<|> serveApiV1Tournament cfg
+  serveApiV1Show cfg :<|> serveApiV1Tournament cfg
 
 serveApi :: ConfigFile -> Server Api
 serveApi =
@@ -83,6 +83,7 @@ serveApi =
 
 server :: ConfigFile -> Server TopLevelRoutes
 server cfg =
+  serveApiV1Metric cfg :<|>
   serveHealthcheck :<|>
   serveApi cfg :<|>
   serveDirectory' (cfg ^. #clientFilePath)

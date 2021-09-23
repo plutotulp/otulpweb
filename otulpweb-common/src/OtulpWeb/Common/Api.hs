@@ -14,8 +14,6 @@ import Data.Text (Text)
 newtype SvgElement = SvgElement Svg.Element
 
 type ApiV1 =
-  "metric" :> Get '[PlainText] Text
-  :<|>
   "show" :> Get '[JSON] Text
   :<|>
   "tournament" :> Capture "n" Int :> Get '[SvgElement] SvgElement
@@ -24,6 +22,8 @@ type Api =
   "v1" :> ApiV1
 
 type TopLevelRoutes =
+  "metrics" :> Get '[PlainText] Text
+  :<|>
   "healthcheck" :> Get '[PlainText] Text
   :<|>
   "api" :> Api
