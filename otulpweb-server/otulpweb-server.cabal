@@ -29,6 +29,7 @@ executable server
                   , http-types
                   , interpolatedstring-perl6
                   , lens
+                  , mtl
                   , optparse-applicative
                   , servant
                   , servant-server

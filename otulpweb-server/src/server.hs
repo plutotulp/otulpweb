@@ -15,6 +15,7 @@ import Control.Lens
 import System.Exit
 import System.IO
 
+import Control.Monad.IO.Class (liftIO)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text
 import Diagrams (renderDia, mkWidth)
@@ -39,34 +40,38 @@ instance MimeRender SvgElement SvgElement where
 
 serveDirectory' :: FilePath -> ServerT Raw m
 serveDirectory' dir =
-  serveDirectoryWith settings
+  serveDirectoryWith settings -- FIXME: Add logging here
   where
     settings =
       (defaultWebAppSettings dir)
       { ssIndices = [ unsafeToPiece "index.html"] }
 
 serveHealthcheck :: Handler Text
-serveHealthcheck =
+serveHealthcheck = do
+  liftIO $ Text.hPutStrLn stderr [qc|Serve healthcheck|]
   pure "Server is healthy"
 
 serveApiV1Metric :: ConfigFile -> Handler Text
-serveApiV1Metric _cfg =
+serveApiV1Metric _cfg = do
+  liftIO $ Text.hPutStrLn stderr [qc|Serve metrics|]
   pure "You need to post some metrics"
 
 serveApiV1Show :: ConfigFile -> Handler Text
-serveApiV1Show _cfg =
+serveApiV1Show _cfg = do
+  liftIO $ Text.hPutStrLn stderr [qc|Serve show|]
   pure "Showing EVERYTHING"
 
 -- FIXME: How do we get screen size? I'm guessing we should just take
 -- it at as parameter here and let the app worry about formualting the
 -- correct call.
 serveApiV1Tournament :: ConfigFile -> Int -> Handler SvgElement
-serveApiV1Tournament _cfg n =
+serveApiV1Tournament _cfg n = do
+  liftIO $ Text.hPutStrLn stderr [qc|Serve tournament {n}|]
   pure
-  (SvgElement
-    (renderDia SVG
-     (SVGOptions (mkWidth 1000) Nothing "" [] True)
-     (tournament n)))
+    (SvgElement
+      (renderDia SVG
+        (SVGOptions (mkWidth 1000) Nothing "" [] True)
+        (tournament n)))
 
 serveApiV1 :: ConfigFile -> Server ApiV1
 serveApiV1 cfg =
