@@ -99,5 +99,5 @@ main = do
       exitFailure
     Right cfg -> do
       let port = cfg ^. #listenPort . to fromIntegral
-      Text.hPutStrLn stderr [qc|Running on http://0.0.0.0:{port}|]
+      Text.hPutStrLn stderr [qc|Listening on http://0.0.0.0:{port}|]
       run port (app cfg)
