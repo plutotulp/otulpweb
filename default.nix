@@ -21,7 +21,7 @@ let
       };
     };
     server = {
-      haskellPackages = pkgs.haskell.packages.ghc8104;
+      haskellPackages = pkgs.haskell.packages.ghc8107;
     };
   };
 
