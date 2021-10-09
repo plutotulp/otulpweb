@@ -17,10 +17,10 @@
         "homepage": "https://haskell-miso.org",
         "owner": "dmjio",
         "repo": "miso",
-        "rev": "dfa1007e22dbe543962ed619076f69084b14bcbe",
-        "sha256": "021dxk24wrh3cs0s48gpldrq5f8c54pnpf0nxsd6c23c405ch8fn",
+        "rev": "fb48f5eee4189a22a314920c3d41f12835171d5d",
+        "sha256": "12hxs3i7pigyccbs75b6xp00cg02lphbq16abwyx4ah2sgasvpml",
         "type": "tarball",
-        "url": "https://github.com/dmjio/miso/archive/dfa1007e22dbe543962ed619076f69084b14bcbe.tar.gz",
+        "url": "https://github.com/dmjio/miso/archive/fb48f5eee4189a22a314920c3d41f12835171d5d.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -36,15 +36,15 @@
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "haskell-updates",
+        "branch": "nixos-unstable",
         "description": "Nix Packages collection",
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "7d77818c9eade1fccb33901eef06f8b2e624086f",
-        "sha256": "1i48985hw02l0dwb12rds2r2q1idd879cndansw9pr8dh9nbm1yp",
+        "rev": "70088dc29994c32f8520150e34c6e57e8453f895",
+        "sha256": "08ldqfh2cmbvf930yq9pv220sv83k9shq183935l5d8p61fxh5zr",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/7d77818c9eade1fccb33901eef06f8b2e624086f.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/70088dc29994c32f8520150e34c6e57e8453f895.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
