@@ -11,9 +11,8 @@ import Options.Applicative
 
 import Data.Generics.Labels ()
 import GHC.Generics (Generic)
--- import Data.Text (Text)
 
-data ConfigCli =
+newtype ConfigCli =
   Cfg
   { configFile :: FilePath
   }
