@@ -1,7 +1,4 @@
--- {-# language OverloadedStrings #-}
 {-# language DeriveGeneric #-}
--- {-# language LambdaCase #-}
--- {-# language OverloadedLabels #-}
 {-# language RankNTypes #-}
 {-# language DerivingStrategies #-}
 
