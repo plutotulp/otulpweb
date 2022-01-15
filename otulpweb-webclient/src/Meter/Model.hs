@@ -14,7 +14,7 @@ import GHC.Generics (Generic)
 import Miso (Sub, Transition, scheduleIO)
 import Miso.Subscription.History (URI, uriSub, getCurrentURI)
 
-data Model =
+newtype Model =
   M
   { currentURI :: Maybe URI
   }
