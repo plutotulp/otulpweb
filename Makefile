@@ -23,7 +23,7 @@ clean:
 	-rm -r otulpweb-server/dist otulpweb-server/dist-newstyle
 
 # Run ghcid session for otulpweb-webclient. This is good for spotting
-# errors.
+# compilation errors quickly.
 .PHONY: webclient-dev-ghcid
 webclient-dev-ghcid:
 	cd otulpweb-webclient && nix-shell --run run-ghcid
@@ -50,7 +50,8 @@ common-dev-ghcid-tasty:
 server-dev-ghcid:
 	cd otulpweb-server && nix-shell --run run-ghcid
 
-# Run ghcid session for otulpweb-server.
+# Run ghcid session for otulpweb-server, including starting the
+# server.
 .PHONY: server-dev-ghcid
 server-dev-ghcid-server:
 	cd otulpweb-server && nix-shell --run run-ghcid-main

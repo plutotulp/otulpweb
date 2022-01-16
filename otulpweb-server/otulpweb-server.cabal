@@ -16,12 +16,16 @@ executable server
   hs-source-dirs:   src
   ghc-options:      -Wall -threaded -rtsopts
   main-is:          server.hs
-  other-modules:    ConfigCli
+  other-modules:    Config
+                  , ConfigCli
                   , ConfigFile
                   , Tournament
   build-depends:    base
                   , otulpweb-common
+                  , aeson
                   , bytestring
+                  , conduit
+                  , containers
                   , dhall
                   , exceptions
                   , generic-lens
@@ -31,10 +35,17 @@ executable server
                   , lens
                   , mtl
                   , optparse-applicative
+                  , polysemy
+                  -- , prometheus
+                  -- , prometheus-metrics-ghc
+                  -- , prometheus-wai-middleware
+                  , resourcet
                   , servant
                   , servant-server
                   , svg-builder
                   , text
+                  , time
+                  , uuid
                   , wai
                   , wai-app-static
                   , warp

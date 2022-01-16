@@ -14,14 +14,14 @@ let
   cfg = {
     webclient = {
       ghc = {
-        haskellPackages = miso.pkgs.haskell.packages.ghc865;
+        haskellPackages = miso.pkgs.haskellPackages;
       };
       ghcjs = {
         haskellPackages = miso.pkgs.haskell.packages.ghcjs;
       };
     };
     server = {
-      haskellPackages = pkgs.haskell.packages.ghc8107;
+      haskellPackages = pkgs.haskellPackages;
     };
   };
 

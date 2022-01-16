@@ -1,17 +1,15 @@
+{-# language DeriveGeneric #-}
+{-# language DerivingStrategies #-}
+{-# language LambdaCase #-}
 {-# language OverloadedStrings #-}
 {-# language QuasiQuotes #-}
-{-# language DeriveGeneric #-}
-{-# language LambdaCase #-}
--- {-# language OverloadedLabels #-}
 {-# language RankNTypes #-}
-{-# language DerivingStrategies #-}
 {-# language ScopedTypeVariables #-}
 
 module ConfigFile where
 
-import Data.Word
-import System.IO.Error
--- import Data.Typeable
+import Data.Word ( Word32 )
+import System.IO.Error ( isDoesNotExistError )
 
 import Control.Monad.Catch (handleIf)
 import qualified Dhall
@@ -19,13 +17,10 @@ import Dhall (FromDhall)
 import Data.Generics.Labels ()
 import GHC.Generics (Generic)
 import Data.Text (Text)
--- import qualified Data.Text as Text
--- import Data.Text.Encoding (decodeUtf8)
--- import qualified Data.ByteString as BS
 import Text.InterpolatedString.Perl6 (qc)
 
 data ConfigFile =
-  Cfg
+  ConfigFile
   { clientFilePath :: FilePath
   , listenPort :: Word32
   }
@@ -33,16 +28,16 @@ data ConfigFile =
 
 instance FromDhall ConfigFile
 
-data ConfigError
+newtype ConfigFileError
   = FileDoesNotExist FilePath
   deriving Show
 
-ppConfigError :: ConfigError -> Text
-ppConfigError = \case
+ppConfigFileError :: ConfigFileError -> Text
+ppConfigFileError = \case
   FileDoesNotExist fp ->
     [qc|Configuration file "{fp}" does not exist|]
 
-readConfigFile :: FilePath -> IO (Either ConfigError ConfigFile)
+readConfigFile :: FilePath -> IO (Either ConfigFileError ConfigFile)
 readConfigFile fp =
   handleIf isDoesNotExistError dnee tryParseFile
   where
