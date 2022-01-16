@@ -65,33 +65,7 @@ in let
         otulpweb-common = otulpweb-common.server;
       };
 
-  boostrap_base_url = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist";
-
 in let
-
-  bootstrap_js =
-    builtins.fetchurl {
-      url = "${boostrap_base_url}/js/bootstrap.bundle.min.js";
-      sha256 = "0shl5z7kpkq35k6xfg99pf67qi5z89zqfaiqkwpxhapnl7wijp9j";
-    };
-
-  bootstrap_js_map =
-    builtins.fetchurl {
-      url = "${boostrap_base_url}/js/bootstrap.bundle.min.js.map";
-      sha256 = "097yv76039wmyb0mnrmdfmcb2pawajyxcfgvvs2b8pj1r2pscp1m";
-    };
-
-  bootstrap_css =
-    builtins.fetchurl {
-      url = "${boostrap_base_url}/css/bootstrap.min.css";
-      sha256 = "0r7g1wianw6l3xzqs6gh6399hz50g91p600yrlm9pqfrrp73y204";
-    };
-
-  bootstrap_css_map =
-    builtins.fetchurl {
-      url = "${boostrap_base_url}/css/bootstrap.min.css.map";
-      sha256 = "0lmq9j0adrvxqa0x3g48rgb0l4h8wpdf7arf1aynsdx82vahpjdn";
-    };
 
   otulpweb-webclient-closurecompiled =
     pkgs.runCommand "otulpweb-webclient-closurecompiled" {
@@ -111,20 +85,58 @@ in let
 
 in let
 
+  bootstrap =
+    let
+      boostrap_base_url = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist";
+
+      bootstrap_js =
+        builtins.fetchurl {
+          url = "${boostrap_base_url}/js/bootstrap.bundle.min.js";
+          sha256 = "1lsgvx7qbiccmdyy2iccsbyrkvy0j802hzzba565l97hwyihy8gm";
+        };
+
+      bootstrap_js_map =
+        builtins.fetchurl {
+          url = "${boostrap_base_url}/js/bootstrap.bundle.min.js.map";
+          sha256 = "1xk8x528hmanycjhsdfhbn1wd2bcgq85cgcf1xmlhb1g6pw200p0";
+        };
+
+      bootstrap_css =
+        builtins.fetchurl {
+          url = "${boostrap_base_url}/css/bootstrap.min.css";
+          sha256 = "1awhg3x1c1ccj9caf9x6v2s0khwljmqqwqscal1rza14z0f4pxv2";
+        };
+
+      bootstrap_css_map =
+        builtins.fetchurl {
+          url = "${boostrap_base_url}/css/bootstrap.min.css.map";
+          sha256 = "04swi2mg6asrqqsayz66avf08m7lk05hhl87v23y2c9123wkxvxa";
+        };
+
+    in pkgs.runCommand "bootstrap" {
+      inherit bootstrap_css bootstrap_css_map bootstrap_js bootstrap_js_map;
+    } ''
+    mkdir -p $out
+    cp -v $bootstrap_js      $out/bootstrap.bundle.min.js
+    cp -v $bootstrap_js_map  $out/bootstrap.bundle.min.js.map
+    cp -v $bootstrap_css     $out/bootstrap.min.css
+    cp -v $bootstrap_css_map $out/bootstrap.min.css.map
+    '';
+
   otulpweb-deployment =
     pkgs.runCommand "otulpweb-deployment" {
       server = otulpweb-server;
       client = otulpweb-webclient-closurecompiled;
-      inherit src bootstrap_css bootstrap_css_map bootstrap_js bootstrap_js_map;
+      inherit src bootstrap;
     } ''
 
     mkdir -p $out/static
     cp -v $src/index.html $out/static/
     cp -v $src/favicon.ico $out/static/
-    cp -v $bootstrap_js      $out/static/bootstrap.bundle.min.js
-    cp -v $bootstrap_js_map  $out/static/bootstrap.bundle.min.js.map
-    cp -v $bootstrap_css     $out/static/bootstrap.min.css
-    cp -v $bootstrap_css_map $out/static/bootstrap.min.css.map
+    cp -v $bootstrap/bootstrap.bundle.min.js     $out/static/bootstrap.bundle.min.js
+    cp -v $bootstrap/bootstrap.bundle.min.js.map $out/static/bootstrap.bundle.min.js.map
+    cp -v $bootstrap/bootstrap.min.css           $out/static/bootstrap.min.css
+    cp -v $bootstrap/bootstrap.min.css.map       $out/static/bootstrap.min.css.map
     cp -v $client/all.js $out/static/
 
     cp -v $src/config.dhall $out/
@@ -150,6 +162,9 @@ in {
   inherit miso pkgs;
 
   inherit cfg src devTools;
+
+  # This is just a directory of bootstrap files.
+  inherit bootstrap;
 
   # Derivations for the cabal projects.
   inherit otulpweb-common otulpweb-webclient otulpweb-server;
