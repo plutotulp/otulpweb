@@ -41,7 +41,6 @@ import qualified Data.Map.Strict as Map
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Text (Text)
-import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
 import qualified Data.Text.IO as Text
 import Data.Time (UTCTime)
@@ -181,25 +180,14 @@ data Logger m a where
 
 P.makeSem ''Logger
 
-data LogJSONEntry a =
-  Entry
-  { ts :: UTCTime
-  , payload :: a
-  }
-  deriving Generic
-
-instance ToJSON a => ToJSON (LogJSONEntry a)
-
 loggerToOutput ::
-  Members [Timestamp, Output ByteString] r => Sem (Logger ': r) a -> Sem r a
+  Member (Output ByteString) r => Sem (Logger ': r) a -> Sem r a
 loggerToOutput  =
   P.interpret \case
   LogTxt txt -> do
-    ts <- getTimestamp
-    P.output (encodeUtf8 (Text.pack (show ts) <> " " <> txt))
-  LogJSON payload -> do
-    ts <- getTimestamp
-    P.output (BSL.toStrict (Aeson.encode Entry {..}))
+    P.output (encodeUtf8 txt)
+  LogJSON json -> do
+    P.output (BSL.toStrict (Aeson.encode json))
 
 tracerOutputToLogger :: Member Logger r => Sem (Output TracerOutput ': r) a -> Sem r a
 tracerOutputToLogger = P.runOutputSem logJSON
