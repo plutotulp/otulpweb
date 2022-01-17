@@ -151,7 +151,7 @@ in let
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       WorkingDirectory = "${otulpweb-deployment}";
-      ExecStart = "${otulpweb-deployment}/otulpweb-server --config config.dhall +RTS -N -T -S";
+      ExecStart = "${otulpweb-deployment}/otulpweb-server --config config.dhall +RTS -N";
       Restart = "always";
     };
   };
