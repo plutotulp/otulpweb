@@ -91,7 +91,7 @@ transition = \case
     pt <- use (#plainText . to fromMisoString)
 
     let nums = mapMaybe Rot.charToInt pt
-    #numCt .= ms (concatMap show nums)
+    #numCt .= ms (unwords (show <$> nums))
     #numPt .= ms (mapMaybe Rot.intToChar nums)
 
     rk <- use #rotKey
