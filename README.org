@@ -79,7 +79,7 @@
      called), but more capable? Supports Sqlite and Postresql, maybe
      more. Has [[https://haskell-beam.github.io/beam/][nice docs]]!
    - persistent :: Popular, I think? Weird primary key demands, I seem
-     to recall. I thnk there's some migration strategy. Pairs with
+     to recall. I think there's some migration strategy. Pairs with
      esqueleto (or whatever it's called) for typed queries, but I
      remember these becoming unwieldy. Supports at least Sqlite and
      Postgres, maybe more.
