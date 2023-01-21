@@ -1,7 +1,6 @@
 {-# language DeriveGeneric #-}
 {-# language DerivingStrategies #-}
 {-# language OverloadedLabels #-}
-{-# language OverloadedStrings #-}
 {-# language RankNTypes #-}
 {-# language RecordWildCards #-}
 {-# language ScopedTypeVariables #-}
