@@ -52,6 +52,6 @@ server-dev-ghcid:
 
 # Run ghcid session for otulpweb-server, including starting the
 # server.
-.PHONY: server-dev-ghcid
+.PHONY: server-dev-ghcid-server
 server-dev-ghcid-server:
 	cd otulpweb-server && nix-shell --run run-ghcid-main
