@@ -1,11 +1,7 @@
-{ sources  ? import ./nix/sources.nix
-}:
+{ miso,  pkgs, gitignore }:
 
 let
-  miso = import sources.miso {};
-  pkgs = import sources.nixpkgs {};
-  gitignore = import sources."gitignore.nix" { inherit (pkgs) lib; };
-  gitignoreSource = gitignore.gitignoreSource;
+  gitignoreSource = gitignore.lib.gitignoreSource;
 
   src = gitignoreSource ./.;
 
