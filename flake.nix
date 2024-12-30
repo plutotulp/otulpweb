@@ -33,9 +33,9 @@
               default = false;
               example = true;
               description = ''
-          Run otulpweb service. Default configuration listens on port 8080 and
-          uses all available cores.
-          '';
+              Run otulpweb service. Default configuration listens on port 8080 and
+              uses all available cores.
+              '';
             };
           };
 
