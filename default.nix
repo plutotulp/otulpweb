@@ -146,6 +146,7 @@ in let
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
+      DynamicUser = true;
       WorkingDirectory = "${otulpweb-deployment}";
       ExecStart = "${otulpweb-deployment}/otulpweb-server --config config.dhall +RTS -N";
       Restart = "always";
