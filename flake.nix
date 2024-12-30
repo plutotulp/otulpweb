@@ -1,5 +1,6 @@
 { inputs =
      {
+       nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
        gitignore = {
          url = "github:hercules-ci/gitignore.nix";
          inputs.nixpkgs.follows = "nixpkgs";
