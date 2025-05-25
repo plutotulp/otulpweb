@@ -1,4 +1,4 @@
-{ miso,  pkgs, gitignore }:
+{ pkgs, gitignore }:
 
 let
   gitignoreSource = gitignore.lib.gitignoreSource;
@@ -10,10 +10,10 @@ let
   cfg = {
     webclient = {
       ghc = {
-        haskellPackages = miso.pkgs.haskellPackages;
+        haskellPackages = pkgs.miso.pkgs.haskellPackages;
       };
       ghcjs = {
-        haskellPackages = miso.pkgs.haskell.packages.ghcjs;
+        haskellPackages = pkgs.miso.pkgs.haskell.packages.ghcjs;
       };
     };
     server = {
@@ -22,7 +22,7 @@ let
   };
 
   devTools = {
-    inherit (pkgs) niv hlint cabal-install ghcid;
+    inherit (pkgs) hlint cabal-install ghcid;
   };
 
   otulpweb-common =
@@ -36,8 +36,6 @@ let
       webclient.ghcjs = mkDerivation cfg.webclient.ghcjs;
     };
 
-in let
-
   otulpweb-webclient =
     let
       mkDerivation = pkgs: args:
@@ -45,7 +43,7 @@ in let
           "otulpweb-webclient" ./otulpweb-webclient args;
     in {
       ghc = mkDerivation cfg.webclient.ghc {
-        miso = miso.miso-jsaddle;
+        miso = pkgs.miso.miso-jsaddle;
         otulpweb-common = otulpweb-common.webclient.ghc;
       };
 
@@ -60,8 +58,6 @@ in let
       "otulpweb-server" ./otulpweb-server {
         otulpweb-common = otulpweb-common.server;
       };
-
-in let
 
   otulpweb-webclient-closurecompiled =
     pkgs.runCommand "otulpweb-webclient-closurecompiled" {
@@ -78,8 +74,6 @@ in let
       --js_output_file all.js
     cp -v all.js $out/
     '';
-
-in let
 
   bootstrap =
     let
@@ -139,8 +133,6 @@ in let
     cp -v $server/bin/server $out/otulpweb-server
     '';
 
-in let
-
   otulpweb-service = {
     description = "Otulpweb server";
     after = [ "network.target" ];
@@ -155,8 +147,8 @@ in let
 
 in {
 
-  # Package sets.
-  inherit miso pkgs;
+  # This is for debugging
+  inherit pkgs;
 
   inherit cfg src devTools;
 
