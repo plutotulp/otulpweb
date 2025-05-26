@@ -39,7 +39,7 @@
           self.overlays.otulpweb
         ];
       };
-      nixosModules.otulpweb = import ./otulpweb-module.nix;
+      nixosModules.default = import ./otulpweb-module.nix;
 
       # FIXME: Denne kan dø.
       nixosConfigurations.blargh = let
