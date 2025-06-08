@@ -1,13 +1,6 @@
-# Our own build dir
-/build/
-
 # macos shenanigans
 /.DS_Store
 /._.DS_Store
-
-# cabal-install build dirs, which might come up by accident.
-*/dist-newstyle/
-*/dist/
 
 # nix-build results symlinks
 */result
