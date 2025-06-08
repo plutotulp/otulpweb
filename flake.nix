@@ -1,52 +1,27 @@
-{ inputs =
-     {
-       nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-       gitignore = {
-         url = "github:hercules-ci/gitignore.nix";
-         inputs.nixpkgs.follows = "nixpkgs";
-       };
-       miso = {
-         url = "github:dmjio/miso";
-         flake = false;
-       };
-     };
-
-  outputs =
-    { self, nixpkgs, gitignore, miso, ... }:
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
     let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-      otulpweb = import ./. {
-        inherit pkgs gitignore;
-        miso = import miso { inherit system; };
-      };
-
-      otulpweb-module = { lib, config, pkgs, ... }:
-        let
-          cfg = config.services.otulpweb;
-        in
-        {
-          imports = [];
-
-          options.services.otulpweb = {
-            enable = lib.mkOption {
-              default = false;
-              example = true;
-              description = ''
-              Run otulpweb service. Default configuration listens on port 8080 and
-              uses all available cores.
-              '';
-            };
-          };
-
-          config = lib.mkIf cfg.enable {
-            environment.systemPackages = [ otulpweb.otulpweb-deployment ];
-            systemd.services.otulpweb = otulpweb.otulpweb-service;
-          };
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      mkSystemOutputs = system:
+        let pkgs =
+              import nixpkgs {
+                inherit system;
+                overlays = [ self.overlays.default ];
+              };
+        in {
+          packages.default = pkgs.otulpweb;
+          devShells.default = pkgs.callPackage ./shell.nix {};
         };
     in
-    {
-      packages.${system}.default = otulpweb.otulpweb-deployment;
-      nixosModules.default = otulpweb-module;
-    };
+      {
+        inherit inputs;
+        overlays.default = import ./overlay.nix;
+      } // flake-utils.lib.eachSystem systems mkSystemOutputs;
 }
