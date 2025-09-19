@@ -11,3 +11,4 @@
 
 # nix-build results symlinks
 */result
+/.nixos-test-history
