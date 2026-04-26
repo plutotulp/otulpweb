@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
     gitignore = {
       url = "github:hercules-ci/gitignore.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -15,13 +16,15 @@
     {
       self,
       nixpkgs,
+      flake-utils,
       gitignore,
       miso,
       ...
     }:
     let
-      misopkgsFrom = system: import miso { inherit system; };
-      pkgsFrom =
+      systems = [ "x86_64-linux" ];
+      misopkgsFor = system: import miso { inherit system; };
+      pkgsFor =
         system:
         import nixpkgs {
           config = { };
@@ -42,7 +45,7 @@
           final: prev:
           (
             let
-              misopkgs = misopkgsFrom final.stdenv.hostPlatform.system;
+              misopkgs = misopkgsFor final.stdenv.hostPlatform.system;
             in
             {
               misoHaskellPackages = misopkgs.pkgs.haskellPackages;
@@ -61,16 +64,16 @@
 
       };
     }
-    // (
+    // flake-utils.lib.eachSystem systems (
+      system:
       let
-        system = "x86_64-linux";
-        pkgs = pkgsFrom system;
+        pkgs = pkgsFor system;
       in
       {
 
-        formatter.${system} = pkgs.nixfmt;
+        formatter = pkgs.nixfmt;
 
-        devShells.${system}.default = pkgs.mkShell {
+        devShells.default = pkgs.mkShell {
           packages = builtins.attrValues {
             inherit (pkgs)
               niv
@@ -81,9 +84,9 @@
           };
         };
 
-        packages.${system}.default = pkgs.otulpweb;
+        packages.default = pkgs.otulpweb;
 
-        checks.${system}.default = pkgs.testers.nixosTest {
+        checks.default = pkgs.testers.nixosTest {
 
           name = "otulpweb-service-starts";
 
