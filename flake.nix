@@ -58,8 +58,49 @@
           gitignoreSource = gitignore.lib.gitignoreSource;
         };
 
+        bootstrap = final: prev: {
+          bootstrap = prev.callPackage ./bootstrap.nix { };
+        };
+
+        generate-otulpweb-cabal-nix-files = final: prev: {
+          generate-otulpweb-cabal-nix-files = prev.callPackage ./generate-otulpweb-cabal-nix-files.nix { };
+        };
+
+        otulpweb-common = final: prev: {
+          otulpweb-common-server =
+            prev.haskellPackages.callPackage ./otulpweb-common.nix { };
+          # otulpweb-common-webclient-ghc =
+          #   prev.misoHaskellPackages.callPackage ./otulpweb-common-webclient-ghc.nix { };
+          otulpweb-common-webclient-ghcjs =
+            prev.misoGhcjsHaskellPackages.callPackage ./otulpweb-common-webclient-ghcjs.nix { };
+        };
+
+        otulpweb-webclient = final: prev: {
+          # otulpweb-webclient-ghc =
+          #   prev.misoHaskellPackages.callPackage ./otulpweb-webclient-ghc.nix {
+          #     miso = prev.misoJsaddle;
+          #     otulpweb-common = prev.otulpweb-common-webclient-ghc;
+          #   };
+          otulpweb-webclient-ghcjs =
+            prev.misoGhcjsHaskellPackages.callPackage ./otulpweb-webclient-ghcjs.nix {
+              otulpweb-common = prev.otulpweb-common-webclient-ghcjs;
+            };
+        };
+
+        otulpweb-webclient-closurecompiled = final: prev: {
+          otulpweb-webclient-closurecompiled =
+            prev.callPackage ./otulpweb-webclient-closurecompiled.nix { };
+        };
+
+        otulpweb-server = final: prev: {
+          otulpweb-server =
+            prev.haskellPackages.callPackage ./otulpweb-server.nix {
+              otulpweb-common = prev.otulpweb-common-server;
+            };
+        };
+
         otulpweb = final: prev: {
-          otulpweb = prev.callPackage ./package.nix { };
+          otulpweb = prev.callPackage ./otulpweb.nix { };
         };
 
       };
@@ -84,14 +125,36 @@
           };
         };
 
-        packages.default = pkgs.otulpweb;
+        packages = {
+          inherit (pkgs)
+            cabal2nix
+            bootstrap
+            generate-otulpweb-cabal-nix-files
+            otulpweb-common-server
+            #otulpweb-common-webclient-ghc
+            otulpweb-common-webclient-ghcjs
+            #otulpweb-webclient-ghc
+            otulpweb-webclient-ghcjs
+            otulpweb-webclient-closurecompiled
+            otulpweb-server
+            otulpweb
+          ;
+          misoCabal2nix = pkgs.misoHaskellPackages.cabal2nix;
+          default = pkgs.otulpweb;
+        };
+
+        apps.generate-otulpweb-cabal-nix-files = {
+            type = "app";
+            program = "${nixpkgs.lib.getExe pkgs.generate-otulpweb-cabal-nix-files}";
+            # nix flake check klager hvis jeg ikke har meta?!
+            meta.description = "generate otulpweb-*.nix files from cabal files";
+        };
 
         checks.default = pkgs.testers.nixosTest {
 
           name = "otulpweb-service-starts";
 
-          # FIXME: Needs nix flake update first to be available
-          #interactive.sshBackdoor.enable = true;
+          interactive.sshBackdoor.enable = true;
 
           nodes = {
             machine = {
