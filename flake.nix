@@ -20,56 +20,78 @@
       ...
     }:
     let
-      system = "x86_64-linux";
-      misopkgs = import miso { inherit system; };
-      overlay = super: self: {
-        misoHaskellPackages = misopkgs.pkgs.haskellPackages;
-        misoGhcjsHaskellPackages = misopkgs.pkgs.haskell.packages.ghcjs;
-        misoJsaddle = misopkgs.miso-jsaddle;
-        gitignoreSource = gitignore.lib.gitignoreSource;
-      };
-      pkgs = import nixpkgs {
-        config = {};
-        inherit system;
-        overlays = [ overlay ];
-      };
-      otulpweb = pkgs.callPackage ./package.nix { };
+      misopkgsFrom = system: import miso { inherit system; };
+      pkgsFrom =
+        system:
+        import nixpkgs {
+          config = { };
+          localSystem.system = system;
+          overlays = [ self.overlays.default ];
+        };
     in
     {
-      inherit nixpkgs;
-
       nixosModules.default = import ./module.nix;
 
-      overlays.default = final: prev: {
-        inherit (overlay) misoHaskellPackages misoGhcjsHaskellPackages misoJsaddle gitignoreSource;
-        inherit otulpweb;
-      };
+      overlays = {
 
-      formatter.${system} = pkgs.nixfmt-rfc-style;
+        default = nixpkgs.lib.composeManyExtensions (
+          builtins.attrValues (builtins.removeAttrs self.overlays [ "default" ])
+        );
 
-      devShells.${system}.default = pkgs.mkShell {
-        packages = builtins.attrValues {
-          inherit (pkgs)
-            niv
-            hlint
-            cabal-install
-            ghcid
-            ;
-        };
-      };
-
-      packages.${system}.default = otulpweb;
-
-      checks.${system}.default = pkgs.nixosTest {
-
-        name = "otulpweb-service-starts";
-
-        # FIXME: Needs nix flake update first to be available
-        #interactive.sshBackdoor.enable = true;
-
-        nodes = {
-          machine =
+        miso =
+          final: prev:
+          (
+            let
+              misopkgs = misopkgsFrom final.stdenv.hostPlatform.system;
+            in
             {
+              misoHaskellPackages = misopkgs.pkgs.haskellPackages;
+              misoGhcjsHaskellPackages = misopkgs.pkgs.haskell.packages.ghcjs;
+              misoJsaddle = misopkgs.miso-jsaddle;
+            }
+          );
+
+        gitignore = final: prev: {
+          gitignoreSource = gitignore.lib.gitignoreSource;
+        };
+
+        otulpweb = final: prev: {
+          otulpweb = prev.callPackage ./package.nix { };
+        };
+
+      };
+    }
+    // (
+      let
+        system = "x86_64-linux";
+        pkgs = pkgsFrom system;
+      in
+      {
+
+        formatter.${system} = pkgs.nixfmt;
+
+        devShells.${system}.default = pkgs.mkShell {
+          packages = builtins.attrValues {
+            inherit (pkgs)
+              niv
+              hlint
+              cabal-install
+              ghcid
+              ;
+          };
+        };
+
+        packages.${system}.default = pkgs.otulpweb;
+
+        checks.${system}.default = pkgs.testers.nixosTest {
+
+          name = "otulpweb-service-starts";
+
+          # FIXME: Needs nix flake update first to be available
+          #interactive.sshBackdoor.enable = true;
+
+          nodes = {
+            machine = {
               imports = [
                 { config.nixpkgs.overlays = [ self.overlays.default ]; }
                 self.nixosModules.default
@@ -78,18 +100,20 @@
               config.services.otulpweb.enable = true;
               config.services.otulpweb.settings.listenPort = 9090;
             };
+          };
+
+          testScript =
+            { nodes, ... }:
+            ''
+              start_all()
+              machine.wait_for_unit("multi-user.target")
+              machine.wait_for_unit("otulpweb.service")
+              machine.wait_for_open_port(${builtins.toString nodes.machine.services.otulpweb.settings.listenPort})
+              machine.succeed("curl http://localhost:${builtins.toString nodes.machine.services.otulpweb.settings.listenPort}")
+            '';
+
         };
 
-        testScript = { nodes, ... }:
-          ''
-            start_all()
-            machine.wait_for_unit("multi-user.target")
-            machine.wait_for_unit("otulpweb.service")
-            machine.wait_for_open_port(${builtins.toString nodes.machine.services.otulpweb.settings.listenPort})
-            machine.succeed("curl http://localhost:${builtins.toString nodes.machine.services.otulpweb.settings.listenPort}")
-          '';
-
-      };
-
-    };
+      }
+    );
 }

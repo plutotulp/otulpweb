@@ -108,8 +108,8 @@ let
         cp -v $bootstrap_css_map $out/bootstrap.min.css.map
       '';
 
-  otulpweb-deployment =
-    runCommand "otulpweb-deployment"
+  otulpweb =
+    runCommand "otulpweb"
       {
         server = otulpweb-server;
         client = otulpweb-webclient-closurecompiled;
@@ -130,4 +130,4 @@ let
       '';
 
 in
-otulpweb-deployment
+otulpweb
