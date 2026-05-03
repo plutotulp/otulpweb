@@ -1,8 +1,0 @@
-#+TITLE: www.otulp.net
-#+OPTIONS: ^:{} toc:nil
-#+LANGUAGE: en
-
-* Overview
-  Server and client code for the www.otulp.net web site. Mostly an
-  experiment in both writing Haskell on both back and front ends, as
-  well as bulding with nix.
