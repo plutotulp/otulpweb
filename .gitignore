@@ -13,3 +13,7 @@
 */result
 /result
 /.nixos-test-history
+
+# builds from lustre experiment
+/lustre/otulpweb/build
+/lustre/otulpweb/.lustre
