@@ -48,6 +48,21 @@ in
         WorkingDirectory = "${pkgs.otulpweb}";
         ExecStart = "${pkgs.otulpweb}/otulpweb-server --config ${configFile} +RTS -N";
         Restart = "always";
+
+        # Forslag fra https://roguesecurity.dev/blog/systemd-hardening
+        #
+        # Sjekk med `systemd analyze security otulpweb.service`
+        ProtectSystem = "strict"; # ser ut til å være standard
+        PrivateTmp = true;
+        ProtectHome = true;
+        ProtectClock = true;
+        ProtectKernelLogs = true;
+        ProtectKernelModules = true;
+        RestrictSUIDSGID = true; # ser ut til å være standard
+        UMask = "0077";
+        LockPersonality = true;
+        RestrictRealtime = true;
+        MemoryDenyWriteExecute = true;
       };
     };
   };
