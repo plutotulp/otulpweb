@@ -50,7 +50,8 @@ in
         Restart = "always";
 
         CapabilityBoundingSet = ""; # Binder til høy port, så bør ikke engang trenge CAP_NET_BIND_SERVICE
-        DevicePolicy = "strict";
+        #DevicePolicy = "strict";
+        DevicePolicy = "auto";
         LockPersonality = true;
         MemoryDenyWriteExecute = true;
         NoNewPrivileges = true;
