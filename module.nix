@@ -50,8 +50,7 @@ in
         Restart = "always";
 
         CapabilityBoundingSet = ""; # Binder til høy port, så bør ikke engang trenge CAP_NET_BIND_SERVICE
-        #DevicePolicy = "strict";
-        DevicePolicy = "auto";
+        DevicePolicy = "closed";
         LockPersonality = true;
         MemoryDenyWriteExecute = true;
         NoNewPrivileges = true;
@@ -80,10 +79,11 @@ in
         RestrictRealtime = true;
         RestrictSUIDSGID = true; # ser ut til å være standard
         SystemCallArchitectures = "native";
-        # SystemCallFilter = [
-        #   "@basic-io @file-system @network-io"
-        #   "~@privileged @mount @resources @clock @module @raw-io @debug @process"
-        # ];
+        SystemCallErrorNumber = "EPERM"; # logg evt. blokkerte syscall
+        SystemCallFilter = [
+          "@system-service"
+          "~@privileged @resources"
+        ];
         UMask = "0077";
       };
     };
