@@ -49,20 +49,41 @@ in
         ExecStart = "${pkgs.otulpweb}/otulpweb-server --config ${configFile} +RTS -N";
         Restart = "always";
 
-        # Forslag fra https://roguesecurity.dev/blog/systemd-hardening
-        #
-        # Sjekk med `systemd analyze security otulpweb.service`
-        ProtectSystem = "strict"; # ser ut til å være standard
+        CapabilityBoundingSet = ""; # Binder til høy port, så bør ikke engang trenge CAP_NET_BIND_SERVICE
+        DevicePolicy = "strict";
+        LockPersonality = true;
+        MemoryDenyWriteExecute = true;
+        NoNewPrivileges = true;
+        PrivateDevices = true;
+        PrivateUsers = true;
         PrivateTmp = true;
-        ProtectHome = true;
         ProtectClock = true;
+        ProtectControlGroups = true;
+        ProtectHome = true;
+        ProtectHostname = true;
         ProtectKernelLogs = true;
         ProtectKernelModules = true;
-        RestrictSUIDSGID = true; # ser ut til å være standard
-        UMask = "0077";
-        LockPersonality = true;
+        ProtectKernelTunables = true;
+
+        # - invisible (ser bare seg selv)
+        # - ptraceable (ser prosesser ptrace kan monitorere)
+        # - noaccess
+        # ProcSubset er mer moderne alternativ til ProtectProc, men
+        # invisible er bra default for service, når kombinert med
+        # andre sandboxing-opsjoner.
+        ProtectProc = "invisible";
+
+        ProtectSystem = "strict"; # ser ut til å være standard
+        RestrictAddressFamilies = "AF_INET AF_INET6 AF_UNIX";
+        RestrictNamespaces = true; # Om problemer, slå av denne først
         RestrictRealtime = true;
-        MemoryDenyWriteExecute = true;
+        RestrictSUIDSGID = true; # ser ut til å være standard
+        SystemCallArchitectures = "native";
+        # SystemCallFilter = [
+        #   "@basic-io @file-system @network-io"
+        #   "~@privileged @mount @resources @clock @module @raw-io @debug @process"
+        # ];
+        UMask = "0077";
       };
     };
   };
